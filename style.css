@@ -1,0 +1,45 @@
+.container {
+    max-width: 800px;
+}
+
+/*
+[data-nomes] > dl {
+    &:not(:last-of-type) {
+        margin-bottom: 1rem;
+    }
+
+    &:has(input:checked) {
+        & > dt > label {
+            position: absolute;
+            color: var(--color-checked-mark);
+        
+            &::before {
+                content: '\2713';
+            }
+        }
+
+        & input:checked {
+            --value-radio: attr(value);
+        }
+        
+        &:has(input[value="1"]:checked) { --color-checked-mark: var(--bs-indigo) }
+        &:has(input[value="2"]:checked) { --color-checked-mark: var(--bs-blue) }
+        &:has(input[value="3"]:checked) { --color-checked-mark: var(--bs-yellow) }
+        &:has(input[value="salada"]:checked) { --color-checked-mark: var(--bs-green) }
+    }
+}
+*/
+
+input[type="radio"], input[type="radio"] + label {
+    cursor: pointer;
+}
+
+dialog::after {
+    content: attr(final-msg);
+    font-style: oblique;
+    font-size: small;
+    font-weight: bolder;
+    position: absolute;
+    right: 1%;
+    bottom: 1%;
+}
