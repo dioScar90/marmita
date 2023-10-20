@@ -1,4 +1,4 @@
-import { clientes } from './clientes.js'
+import { getNames, setNames, toggleActiveName, removeName, } from './names_module.js'
 
 const formMarmitas = document.querySelector('#form-marmitas')
 const openPedidosModal = document.querySelector('#openPedidosModal')
@@ -235,13 +235,17 @@ const getNewFormElement = (nome) => {
 }
 
 const mountFormElements = () => {
-  // const nomes = possiveisClientes.getNomes()
+  const names = getNames()
   
   const template = document.createElement('template')
   const divNomes = formMarmitas.querySelector('[data-nomes]')
   
-  for (const nome of clientes) {
-    const newElement = getNewFormElement(nome)
+  for (const { name, isActive } of names) {
+    if (!isActive) {
+      continue
+    }
+    
+    const newElement = getNewFormElement(name)
     template.innerHTML += newElement
   }
   

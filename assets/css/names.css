@@ -1,0 +1,12 @@
+.form-check {
+  &> :is(.form-check-input, .form-check-label) {
+    cursor: pointer;
+  }
+
+  &:has(.form-check-input:checked)>.form-check-label {}
+
+  &:not(:has(.form-check-input:checked))>.form-check-label {
+    font-weight: unset !important;
+    color: var(--bs-grey);
+  }
+}
