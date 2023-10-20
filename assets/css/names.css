@@ -3,10 +3,30 @@
     cursor: pointer;
   }
 
-  &:has(.form-check-input:checked)>.form-check-label {}
+  &:has(.form-check-input:checked)>.form-check-label {
+    &::after {
+      content: attr(data-ativo);
+    }
+  }
 
   &:not(:has(.form-check-input:checked))>.form-check-label {
     font-weight: unset !important;
     color: var(--bs-grey);
+
+    &::after {
+      content: attr(data-inativo);
+    }
+  }
+}
+
+#table_names > tbody.for-empty-table {
+  display: none !important;
+
+  &:is(:only-of-type, :has(+ tbody:empty)) {
+    display: revert !important;
+  }
+
+  & td {
+    --bs-table-bg-type: unset !important;
   }
 }

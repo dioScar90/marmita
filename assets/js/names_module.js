@@ -3,12 +3,18 @@ const Names = (() => {
     localStorage.getItem('names') ? JSON.parse(localStorage.getItem('names')) : []
 
   const setNames = (...values) => {
-    const actualNames = getNames() ?? []
-
-    const namesToAppend = values.map(name => ({ name, isActive: true }))
-    const newNames = [ ...actualNames, ...namesToAppend ]
-
-    _updateNames(newNames)
+    try {
+      const actualNames = getNames() ?? []
+  
+      const namesToAppend = values.map(name => ({ name, isActive: true }))
+      const newNames = [ ...actualNames, ...namesToAppend ]
+  
+      _updateNames(newNames)
+  
+      return namesToAppend[0]
+    } catch (err) {
+      return false
+    }
   }
 
   const toggleActiveName = (nameToToggle, isActive = false) => {

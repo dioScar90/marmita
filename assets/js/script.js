@@ -1,8 +1,14 @@
 import { getNames, setNames, toggleActiveName, removeName, } from './names_module.js'
+import { zeroAEsquerda, getHoraFormatada, listenerCreator } from './utils.js'
 
-const formMarmitas = document.querySelector('#form-marmitas')
-const openPedidosModal = document.querySelector('#openPedidosModal')
-const pedidosModal = document.querySelector('#pedidosModal')
+// const formMarmitas = document.querySelector('#form-marmitas')
+// const openPedidosModal = document.querySelector('#openPedidosModal')
+// const pedidosModal = document.querySelector('#pedidosModal')
+
+const isPage = (page) => [page, `${page}.html`].includes(location.pathname.split('/').at(-1))
+
+const isIndexPage = () => isPage('index')
+const isNamesPage = () => isPage('names')
 
 const getValuesDoForm = form => {
   const formData = new FormData(form)
@@ -17,7 +23,7 @@ const getValuesDoForm = form => {
 
 const generateRandomHexColor = () => {
   // Generate a random hex color code (e.g., #RRGGBB)
-  const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16)
+  const randomColor = '#' + Math.floor(Math.random() * 16_777_215).toString(16)
   return randomColor
 }
 
@@ -27,17 +33,69 @@ const getTextoFinal = (pedidos, total) => {
   const textoFinal =
     'Bom dia! Por favor fazer as seguintes marmitas:\n\n' +
     pedidosJoin +
-    '\n\nTotal de marmitas: ' +
+    '\n' +
+    '\n' +
+    'Total de marmitas: ' +
     total +
-    '.' +
-    '\n\nHorário: *11h30*.' +
-    '\n*TI* da *Taramps*, ao lado do Tula.' +
-    '\n\nObrigado.'
+    '.'  +
+    '\n' +
+    '\n' +
+    'Horário: *11h30*.' +
+    '\n' +
+    '*TI* da *Taramps*, ao lado do Tula.' +
+    '\n' +
+    '\n' +
+    'Obrigado.'
 
   return textoFinal
 }
 
-const copyText = async e => {
+const addNewTableRowAfterInStorage = (newName) => {
+  const template = document.createElement('template')
+  const tbody = document.querySelector('#table_names > tbody:not(.for-empty-table)')
+  const lastId = +tbody.lastElementChild.dataset.nameId
+  const idx = lastId - 1
+  const newTR = getNewTableRow(newName, idx)
+  template.innerHTML = newTR
+  tbody.append(template.content)
+}
+
+const addNameInStorage = (e) => {
+  const button = e.currentTarget
+  const modal = button.closest('#addName')
+  const nameInput = modal.querySelector('input[name="name"]')
+  const closeBtn = modal.querySelector('button.btn-close')
+  
+  const addedName = setNames(nameInput.value)
+
+  if (!addedName) {
+    return
+  }
+
+  addNewTableRowAfterInStorage(addedName)
+  closeBtn?.click()
+}
+
+const removeNameInStorage = (e) => {
+  const button = e.currentTarget
+  const modal = button.closest('#removeName')
+  const closeBtn = modal.querySelector('button.btn-close')
+
+  const removed = removeName(button.dataset.name)
+
+  if (!removed) {
+    return
+  }
+  
+  const idx = button.dataset.nameId
+  const tr = document.querySelector(`tr[data-name-id="${idx}"`)
+  tr?.remove()
+
+  closeBtn?.click()
+}
+
+const copyText = async (e) => {
+  const formMarmitas = document.querySelector('#form-marmitas')
   const modal = e.currentTarget.closest('#pedidosModal')
   const closeBtn = modal.querySelector('button.btn-close')
   const textarea = modal.querySelector('.modal-body textarea[hidden]')
@@ -48,13 +106,21 @@ const copyText = async e => {
   if ('clipboard' in navigator) {
     await navigator.clipboard.writeText(textarea.value)
     const alert = document.querySelector('#tudo-bem')
-    setTimeout(() => (alert.hidden = false), 50)
+    setTimeout(() => alert.hidden = false, 50)
   } else {
     setTimeout(() => alert('Não foi possível copiar. :( Por favor tente copiar na unha mesmo.'), 50)
   }
 
-  formMarmitas.reset()
-  closeBtn.click()
+  formMarmitas?.reset()
+  closeBtn?.click()
+}
+
+const openPedidosModal = (textarea, pre) => {
+  const openPedidosModal = document.querySelector('#openPedidosModal')
+  const pedidosModal = document.querySelector('#pedidosModal')
+
+  pedidosModal.querySelector('.modal-body').replaceChildren(textarea, pre)
+  openPedidosModal.click()
 }
 
 const insertAlertMessage = () => {
@@ -63,8 +129,7 @@ const insertAlertMessage = () => {
   if (alert) {
     return
   }
-
-  const divBotoesForm = formMarmitas.querySelector('#botoes-form')
+  
   const alertMessage = `
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="tudo-bem" hidden>
       <strong>Tudo bem, tudo bangos!</strong> Texto copiado com sucesso. <i class="fa-regular fa-face-smile-wink"></i>
@@ -73,6 +138,8 @@ const insertAlertMessage = () => {
       </button>
     </div>
   `
+
+  const divBotoesForm = document.querySelector('#botoes-form')
   divBotoesForm.insertAdjacentHTML('beforebegin', alertMessage)
 }
 
@@ -166,10 +233,8 @@ const formSubmit = e => {
   formClose.method = 'dialog'
 
   formClose.append(textarea, button)
-
-  pedidosModal.querySelector('.modal-body').replaceChildren(textarea, pre)
-  openPedidosModal.click()
-
+  openPedidosModal(textarea, pre)
+  
   sessionStorage.setItem('textoFinal', textoFinal)
   insertAlertMessage()
 }
@@ -195,6 +260,31 @@ const insertPlusOneOption = () => {
 
     div.insertAdjacentHTML('afterend', newDiv)
   })
+}
+
+// const removeNameOk = 
+
+const onclickTableNames = (e) => {
+  const button = e.target.closest('[data-remove][type=button]')
+  
+  if (!button) {
+    return
+  }
+
+  confirmRemoveName(button.dataset)
+}
+
+const onchangeTableNames = (e) => {
+  const inputRadio = e.target.closest(':scope[data-status][type=checkbox]')
+  
+  if (!inputRadio) {
+    return
+  }
+  
+  const isActive = inputRadio.checked
+  const name = inputRadio.dataset.name
+
+  toggleActiveName(name, isActive)
 }
 
 const getRadioSalada = (nome) => (`
@@ -235,10 +325,14 @@ const getNewFormElement = (nome) => {
 }
 
 const mountFormElements = () => {
+  if (!isIndexPage()) {
+    return
+  }
+  
   const names = getNames()
   
   const template = document.createElement('template')
-  const divNomes = formMarmitas.querySelector('[data-nomes]')
+  const divNomes = document.querySelector('#form-marmitas [data-nomes]')
   
   for (const { name, isActive } of names) {
     if (!isActive) {
@@ -259,34 +353,84 @@ const mountFooter = () => {
   spanCurrentYear.innerText = currentYear
 }
 
-const listenerCreator = (() => {
-  let isHTMLElement
+const getTbodyTableNames = () => {
+  const table = document.querySelector('#table_names')
+  const tbody = table.querySelector('tbody:not(.for-empty-table)')
 
-  const setIsHTMLElement = selector =>
-    (isHTMLElement = selector instanceof HTMLElement || selector?.nodeType === 1)
-
-  const getElementByGivenSelector = selector => {
-    setIsHTMLElement(selector)
-
-    if (isHTMLElement) {
-      return selector
-    }
-
-    return document.querySelector(selector)
+  if (tbody) {
+    return tbody
   }
 
-  const create = (eventType, selector, func, callAndRemoveEvent = false) => {
-    const element = getElementByGivenSelector(selector)
-    const options = { once: callAndRemoveEvent }
-    element?.addEventListener(eventType, func, options)
-  }
+  const newTbody = document.createElement('tbody')
+  table.append(newTbody)
 
-  return { create }
-})()
+  listenerCreator.create('click', newTbody, onclickTableNames)
+  listenerCreator.create('change', newTbody, onchangeTableNames)
+
+  return newTbody
+}
+
+const confirmRemoveName = ({ nameId, name }) => {
+  const buttonOpen = document.querySelector('button[data-bs-target="#removeName"]')
+
+  const titleSpan = document.querySelector('#removeName .modal-title span[data-name]')
+  const paragSpan = document.querySelector('#removeName .modal-body span[data-name]')
+  const buttonConfirm = document.querySelector('#removeName .modal-footer button[data-remove-confirm]')
+  
+  titleSpan.innerText = name
+  paragSpan.innerText = name
+  buttonConfirm.dataset.name = name
+  buttonConfirm.dataset.nameId = nameId
+
+  buttonOpen.click()
+}
+
+const getNewTableRow = ({ name, isActive }, idx) => {
+  const position = zeroAEsquerda(idx + 1)
+
+  const checked = isActive ? 'checked' : ''
+  const radioId = `status_${idx}`
+  
+  return `
+    <tr data-name-id="${idx}" data-name="${name}">
+      <th scope="row">${position}</th>
+      <td>${name}</td>
+      <td>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${idx}" data-name="${name}">
+          <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
+        </div>
+      </td>
+      <td>
+        <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${idx}" data-name="${name}">
+          <i class="far fa-trash-alt"></i>
+        </button>
+      </td>
+    </tr>
+  `
+}
+
+const mountTableNames = () => {
+  if (!isNamesPage()) {
+    return
+  }
+  
+  const names = getNames()
+  
+  const template = document.createElement('template')
+  const tbody = getTbodyTableNames()
+  
+  for (const idx in names) {
+    const newTR = getNewTableRow(names[idx], +idx)
+    template.innerHTML += newTR
+  }
+  
+  tbody.replaceChildren(template.content)
+}
 
 const getByChecks = (limit) => {
   const last = limit - 1
-  let stylesheets = []
+  const stylesheets = []
   
   for (let i = 0; i < limit; i++) {
     const value = i === last ? 'salada' : (i + 1).toString()
@@ -323,36 +467,42 @@ const getStylesheetColors = () => {
         }
         
         ${stylesheets}
-        
-        /*
-        &:has(input[value="1"]:checked) { --color-checked-mark: var(--bs-indigo) }
-        &:has(input[value="2"]:checked) { --color-checked-mark: var(--bs-blue) }
-        &:has(input[value="3"]:checked) { --color-checked-mark: var(--bs-yellow) }
-        &:has(input[value="salada"]:checked) { --color-checked-mark: var(--bs-green) }
-        */
       }
     }
   `
 }
 
 const mountCssColor = () => {
+  if (!isIndexPage()) {
+    return
+  }
+  
   const style = document.createElement('style')
   style.innerHTML = getStylesheetColors()
   
   document.head.append(style)
 }
 
+const itemsToCreate = [
+  ['click',   'button[data-copiar]',                        copyText],
+  ['click',   'button[data-add-name]',                      addNameInStorage],
+  ['click',   'button[data-remove-confirm]',                removeNameInStorage],
+  ['click',   '#plus_one_more_option',                      insertPlusOneOption],
+  ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+  ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+  ['reset',   '#form-marmitas',                             formReset],
+  ['submit',  '#form-marmitas',                             formSubmit],
+]
+
 const init = () => {
   mountCssColor()
   mountFormElements()
+  mountTableNames()
   mountFooter()
-  
-  listenerCreator.create('click', 'button[data-copiar]', copyText)
-  listenerCreator.create('click', '#plus_one_more_option', insertPlusOneOption)
 
-  listenerCreator.create('reset', formMarmitas, formReset)
-
-  listenerCreator.create('submit', formMarmitas, formSubmit)
+  for (const [ eventType, selector, func ] of itemsToCreate) {
+    listenerCreator.create(eventType, selector, func)
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init)
