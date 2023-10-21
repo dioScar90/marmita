@@ -1,3 +1,8 @@
 .prettierrc.js
 clientes.js
-node_server
+node_modules
+public
+src/
+bun.lockb
+package.json
+tsconfig.json
