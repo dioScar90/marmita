@@ -1,23 +1,17 @@
 const listenerCreator = (() => {
-  let isHTMLElement
-
-  const setIsHTMLElement = selector =>
-    (isHTMLElement = selector instanceof HTMLElement || selector?.nodeType === 1)
+  const isHTMLElement = selector => selector instanceof HTMLElement || selector?.nodeType === 1
 
   const getElementByGivenSelector = selector => {
-    setIsHTMLElement(selector)
-
-    if (isHTMLElement) {
+    if (isHTMLElement(selector)) {
       return selector
     }
 
     return document.querySelector(selector)
   }
 
-  const create = (eventType, selector, func, callAndRemoveEvent = false) => {
+  const create = (eventType, selector, func, options = {}) => {
     const element = getElementByGivenSelector(selector)
-    const options = { once: callAndRemoveEvent }
-    element?.addEventListener(eventType, func, options)
+    element?.addEventListener(eventType, func, { ...options })
   }
 
   return { create }

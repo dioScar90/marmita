@@ -270,7 +270,16 @@ const insertPlusOneOption = () => {
   })
 }
 
-// const removeNameOk = 
+const goToPage = (page) => {
+  if (page === 'index') {
+    
+  }
+  //
+}
+
+const goToNamesPage = () => {
+  //
+}
 
 const onclickTableNames = (e) => {
   const button = e.target.closest('[data-remove][type=button]')
@@ -491,26 +500,32 @@ const mountCssColor = () => {
   document.head.append(style)
 }
 
-const itemsToCreate = [
-  ['click',   'button[data-copiar]',                        copyText],
-  ['click',   'button[data-add-name]',                      addNameInStorage],
-  ['click',   'button[data-remove-confirm]',                removeNameInStorage],
-  ['click',   '#plus_one_more_option',                      insertPlusOneOption],
-  ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
-  ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
-  ['reset',   '#form-marmitas',                             formReset],
-  ['submit',  '#form-marmitas',                             formSubmit],
-]
+const createEvents = () => {
+  const events = [
+    ['click',   'button[data-copiar]',                        copyText],
+    ['click',   'button[data-add-name]',                      addNameInStorage],
+    ['click',   'button[data-remove-confirm]',                removeNameInStorage],
+    ['click',   '#plus_one_more_option',                      insertPlusOneOption],
+    ['click',   '#go_names',                                  goToNamesPage],
+    ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+    ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    ['reset',   '#form-marmitas',                             formReset],
+    ['submit',  '#form-marmitas',                             formSubmit],
+  ]
+
+  for (const [ eventType, selector, func ] of events) {
+    listenerCreator.create(eventType, selector, func)
+  }
+}
+
 
 const init = () => {
   mountCssColor()
   mountFormElements()
   mountTableNames()
   mountFooter()
-
-  for (const [ eventType, selector, func ] of itemsToCreate) {
-    listenerCreator.create(eventType, selector, func)
-  }
+  
+  createEvents()
 }
 
 document.addEventListener('DOMContentLoaded', init)
