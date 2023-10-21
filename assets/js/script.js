@@ -5,7 +5,15 @@ import { zeroAEsquerda, getHoraFormatada, listenerCreator } from './utils.js'
 // const openPedidosModal = document.querySelector('#openPedidosModal')
 // const pedidosModal = document.querySelector('#pedidosModal')
 
-const isPage = (page) => [page, `${page}.html`].includes(location.pathname.split('/').at(-1))
+const isPage = (page) => {
+  const thisPage = location.pathname.split('/').at(-1)
+
+  if (page === 'index' && thisPage === '') {
+    return true
+  }
+
+  return [page, `${page}.html`].includes(thisPage)
+}
 
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
