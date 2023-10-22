@@ -2,6 +2,10 @@
   max-width: 800px;
 }
 
+btn:disabled {
+  cursor: not-allowed;
+}
+
 .for-empty-names {
   display: none !important;
 
