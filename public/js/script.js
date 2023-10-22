@@ -1,5 +1,5 @@
 import { getNames, setNames, toggleActiveName, removeName, } from './names_module.js'
-import { zeroAEsquerda, getHoraFormatada, listenerCreator } from './utils.js'
+import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues } from './utils.js'
 
 // const formMarmitas = document.querySelector('#form-marmitas')
 // const openPedidosModal = document.querySelector('#openPedidosModal')
@@ -71,13 +71,20 @@ const addNewTableRowAfterInStorage = (addedName) => {
 }
 
 const addNameInStorage = (e) => {
-  const button = e.currentTarget
+  e.preventDefault()
+  
+  const form = e.target
+  const button = e.submitter
+
+  const values = getFormValues(form)
+
+  // const button = e.currentTarget
   const modal = button.closest('#addName')
-  const form = modal.querySelector('form')
-  const nameInput = modal.querySelector('input[name="name"]')
+  // const form = modal.querySelector('form')
+  // const nameInput = modal.querySelector('input[name="name"]')
   const closeBtn = modal.querySelector('button.btn-close')
   
-  const addedName = setNames(nameInput.value)
+  const addedName = setNames(values.name)
 
   if (!addedName) {
     return
@@ -102,7 +109,7 @@ const reSortTbody = ({ children }) => {
 
     const allElementsWithNameId = tr.querySelectorAll('[data-name-id]')
     allElementsWithNameId.forEach(el => el.dataset.nameId = idx)
-    
+
     tr.firstElementChild.innerText = zeroAEsquerda(idx + 1)
   })
 }
@@ -530,7 +537,7 @@ const mountCssColor = () => {
 const createEvents = () => {
   const events = [
     ['click',   'button[data-copiar]',                        copyText],
-    ['click',   'button[data-add-name]',                      addNameInStorage],
+    // ['click',   'button[data-add-name]',                      addNameInStorage],
     ['click',   'button[data-remove-confirm]',                removeNameInStorage],
     ['click',   '#plus_one_more_option',                      insertPlusOneOption],
     ['click',   '#go_names',                                  goToNamesPage],
@@ -538,6 +545,7 @@ const createEvents = () => {
     ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
     ['reset',   '#form-marmitas',                             formReset],
     ['submit',  '#form-marmitas',                             formSubmit],
+    ['submit',  '#adicionar-nome',                            addNameInStorage],
   ]
 
   for (const [ eventType, selector, func ] of events) {

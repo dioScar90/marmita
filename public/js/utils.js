@@ -17,6 +17,17 @@ const listenerCreator = (() => {
   return { create }
 })()
 
+const getFormValues = (form) => {
+  const formData = new FormData(form)
+  const values = {}
+
+  for (const [name, value] of formData) {
+    values[name] = value.trim()
+  }
+
+  return values
+}
+
 const zeroAEsquerda = (str, maxLength = 2) => str.toString().padStart(maxLength, '0')
 
 const getHoraFormatada = (data) => {
@@ -27,4 +38,4 @@ const getHoraFormatada = (data) => {
   return horas(data) + 'h' + minutos(data) + 'm' + segundos(data)
 }
 
-export { zeroAEsquerda, getHoraFormatada, listenerCreator }
+export { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues }

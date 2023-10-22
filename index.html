@@ -30,8 +30,14 @@
 
   <main class="container">
     <form id="form-marmitas">
-      <div class="w-100 d-flex justify-content-center mt-3">
-        <div class="w-75" data-nomes></div>
+      <div class="row justify-content-center mt-3">
+        <div class="col-12 d-flex justify-content-center my-2 for-empty-names">
+          <div class="alert alert-warning mb-0 w-100 text-center">
+            <h4 class="alert-heading h4 mb-0">Nada para exibir!</h4>
+            <p class="mb-0">Nenhum nome cadastrado no momento.</p>
+          </div>
+        </div>
+        <div class="col-9" data-nomes></div>
       </div>
 
       <div class="alert alert-success alert-dismissible fade show" role="alert" id="tudo-bem" hidden>
@@ -49,7 +55,7 @@
               Limpar
             </button>
             <button type="submit" class="btn btn-primary text-nowrap">
-              Gerar pedido
+              Gerar
               <i class="fas fa-utensils"></i>
             </button>
           </div>
@@ -63,7 +69,7 @@
               Opção
             </button>
             <a href="names.html" class="btn btn-success text-nowrap">
-              Novo nome
+              Editar nomes
             </a>
           </div>
         </div>
