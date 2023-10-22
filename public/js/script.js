@@ -380,7 +380,11 @@ const mountFormElements = () => {
   
   divNomes.replaceChildren(template.content)
 
-  const allBtnDisabled = document.querySelector('button[disabled]')
+  if (divNomes.childElementCount === 0) {
+    return
+  }
+
+  const allBtnDisabled = document.querySelectorAll('button[disabled]')
   allBtnDisabled.forEach(btn => btn.disabled = false)
 }
 

@@ -2,7 +2,7 @@
   max-width: 800px;
 }
 
-btn:disabled {
+button[disabled] {
   cursor: not-allowed;
 }
 
