@@ -60,10 +60,15 @@ const addNewTableRowAfterInStorage = (addedName) => {
   const lastTr = tbody.querySelector('tr:nth-last-child(1)')
 
   const idx = lastTr ? +lastTr.dataset.nameId + 1 : 0
-  const newTR = getNewTableRow(addedName, idx)
-  template.innerHTML = newTR
+  const newTrHtml = getNewTableRow(addedName, idx, true)
+  template.innerHTML = newTrHtml
 
   tbody.append(template.content)
+  const newTr = tbody.lastElementChild
+
+  newTr.addEventListener('animationend', () => {
+    newTr.classList.remove('blink')
+  })
 }
 
 const addNameInStorage = (e) => {
@@ -107,6 +112,20 @@ const reSortTbody = ({ children }) => {
   })
 }
 
+const removeTr = async (tr) => {
+  const tbody = tr.closest('tbody')
+  // tr?.remove()
+  tr.classList.add('to-remove')
+  // removeTextNodes(tbody)
+  // reSortTbody(tbody)
+
+  tr.addEventListener('transitionend', () => {
+    tr.remove()
+    removeTextNodes(tbody)
+    reSortTbody(tbody)
+  })
+}
+
 const removeNameInStorage = (e) => {
   const button = e.currentTarget
   const modal = button.closest('#removeName')
@@ -121,10 +140,12 @@ const removeNameInStorage = (e) => {
   const idx = button.dataset.nameId
   const tr = document.querySelector(`tr[data-name-id="${idx}"`)
   const tbody = tr.closest('tbody')
+
+  removeTr(tr)
   
-  tr?.remove()
-  removeTextNodes(tbody)
-  reSortTbody(tbody)
+  // tr?.remove()
+  // removeTextNodes(tbody)
+  // reSortTbody(tbody)
   
   closeBtn?.click()
 }
@@ -427,14 +448,16 @@ const confirmRemoveName = ({ nameId, name }) => {
   buttonOpen.click()
 }
 
-const getNewTableRow = ({ name, isActive }, idx) => {
+const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
   const position = zeroAEsquerda(idx + 1)
 
   const checked = isActive ? 'checked' : ''
   const radioId = `status_${idx}`
+
+  const blinkClass = blink ? 'class="blink"' : ''
   
   const newTR = `
-    <tr data-name-id="${idx}" data-name="${name}">
+    <tr ${blinkClass} data-name-id="${idx}" data-name="${name}">
       <th scope="row">${position}</th>
       <td>${name}</td>
       <td>
