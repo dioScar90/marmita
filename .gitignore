@@ -1,7 +1,6 @@
 .prettierrc.js
 clientes.js
 node_modules
-public
 src/
 bun.lockb
 package.json
