@@ -1,10 +1,6 @@
 import { getNames, setNames, toggleActiveName, removeName, } from './names_module.js'
 import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues } from './utils.js'
 
-// const formMarmitas = document.querySelector('#form-marmitas')
-// const openPedidosModal = document.querySelector('#openPedidosModal')
-// const pedidosModal = document.querySelector('#pedidosModal')
-
 const isPage = (page) => {
   const thisPage = location.pathname.split('/').at(-1)
 
@@ -72,16 +68,13 @@ const addNewTableRowAfterInStorage = (addedName) => {
 
 const addNameInStorage = (e) => {
   e.preventDefault()
-  
+
   const form = e.target
   const button = e.submitter
 
   const values = getFormValues(form)
-
-  // const button = e.currentTarget
+  
   const modal = button.closest('#addName')
-  // const form = modal.querySelector('form')
-  // const nameInput = modal.querySelector('input[name="name"]')
   const closeBtn = modal.querySelector('button.btn-close')
   
   const addedName = setNames(values.name)
@@ -304,17 +297,6 @@ const insertPlusOneOption = () => {
   })
 }
 
-const goToPage = (page) => {
-  if (page === 'index') {
-    
-  }
-  //
-}
-
-const goToNamesPage = () => {
-  //
-}
-
 const onclickTableNames = (e) => {
   const button = e.target.closest('[data-remove][type=button]')
   
@@ -379,6 +361,10 @@ const mountFormElements = () => {
   }
   
   const names = getNames()
+
+  if (names.length === 0) {
+    return
+  }
   
   const template = document.createElement('template')
   const divNomes = document.querySelector('#form-marmitas [data-nomes]')
@@ -393,6 +379,9 @@ const mountFormElements = () => {
   }
   
   divNomes.replaceChildren(template.content)
+
+  const allBtnDisabled = document.querySelector('button[disabled]')
+  allBtnDisabled.forEach(btn => btn.disabled = false)
 }
 
 const mountFooter = () => {
@@ -537,10 +526,8 @@ const mountCssColor = () => {
 const createEvents = () => {
   const events = [
     ['click',   'button[data-copiar]',                        copyText],
-    // ['click',   'button[data-add-name]',                      addNameInStorage],
     ['click',   'button[data-remove-confirm]',                removeNameInStorage],
     ['click',   '#plus_one_more_option',                      insertPlusOneOption],
-    ['click',   '#go_names',                                  goToNamesPage],
     ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
     ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
     ['reset',   '#form-marmitas',                             formReset],
