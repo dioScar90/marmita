@@ -18,7 +18,7 @@
     crossorigin="anonymous"></script>
   <script src="https://kit.fontawesome.com/c5b43aab05.js" crossorigin="anonymous"></script>
 
-  <script type="module" src="./public/js/names_module.js" defer></script>
+  <script type="module" src="./public/js/names.js" defer></script>
   <script type="module" src="./public/js/utils.js" defer></script>
   <script type="module" src="./public/js/script.js" defer></script>
 </head>
@@ -54,28 +54,26 @@
 
       <tbody></tbody>
     </table>
-
-    <div class="w-100 d-flex justify-content-center mt-3">
-      <div class="w-75" data-nomes></div>
-    </div>
-
-    <div class="alert alert-success alert-dismissible fade show" role="alert" id="tudo-bem" hidden>
-      <strong>Tudo bem, tudo bangos!</strong> Nome removido com sucesso. <i class="fa-regular fa-face-smile-wink"></i>
-      <button type="button" class="btn-close h-100 py-0" data-bs-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true"></span>
-      </button>
-    </div>
     
     <div class="row justify-content-center">
-      <div class="col-6 col-md-3 row justify-content-center">
+      <div class="col-4 col-md-3 row justify-content-center">
         <a href="index.html" class="btn btn-secondary text-nowrap w-auto">
-          <i class="fa fa-angle-double-left"></i> Voltar
+          <i class="fa fa-angle-double-left"></i>
+          Voltar
         </a>
       </div>
 
-      <div class="col-6 col-md-3 row justify-content-center">
+      <div class="col-4 col-md-3 row justify-content-center">
+        <button type="button" class="btn btn-info text-nowrap w-auto" data-sort-names>
+          <i class="fa-solid fa-arrow-up-a-z"></i>
+          Ordenar
+        </button>
+      </div>
+
+      <div class="col-4 col-md-3 row justify-content-center">
         <button type="button" class="btn btn-primary text-nowrap w-auto" data-bs-toggle="modal" data-bs-target="#addName">
-          <i class="fa-solid fa-plus"></i> Novo nome
+          <i class="fa-solid fa-plus"></i>
+          Adicionar
         </button>
       </div>
     </div>

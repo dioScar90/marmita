@@ -1,4 +1,4 @@
-import { getNames, setNames, toggleActiveName, removeName, } from './names_module.js'
+import { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
 import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues } from './utils.js'
 
 const isPage = (page) => {
@@ -114,11 +114,8 @@ const reSortTbody = ({ children }) => {
 
 const removeTr = async (tr) => {
   const tbody = tr.closest('tbody')
-  // tr?.remove()
   tr.classList.add('to-remove')
-  // removeTextNodes(tbody)
-  // reSortTbody(tbody)
-
+  
   tr.addEventListener('transitionend', () => {
     tr.remove()
     removeTextNodes(tbody)
@@ -139,15 +136,20 @@ const removeNameInStorage = (e) => {
   
   const idx = button.dataset.nameId
   const tr = document.querySelector(`tr[data-name-id="${idx}"`)
-  const tbody = tr.closest('tbody')
-
+  
   removeTr(tr)
   
-  // tr?.remove()
-  // removeTextNodes(tbody)
-  // reSortTbody(tbody)
-  
   closeBtn?.click()
+}
+
+const sortNamesInTable = () => {
+  const names = sortNames()
+
+  if (!names) {
+    return
+  }
+
+  mountTableNames(names)
 }
 
 const copyText = async (e) => {
@@ -319,13 +321,21 @@ const insertPlusOneOption = () => {
 }
 
 const onclickTableNames = (e) => {
-  const button = e.target.closest('[data-remove][type=button]')
+  const button = e.target.closest(':is([data-remove], [data-order])')
   
   if (!button) {
     return
   }
 
-  confirmRemoveName(button.dataset)
+  if ('remove' in button.dataset) {
+    confirmRemoveName(button.dataset)
+    return
+  }
+
+  if ('order' in button.dataset) {
+    prepareChangeName(button.dataset)
+    return
+  }
 }
 
 const onchangeTableNames = (e) => {
@@ -433,6 +443,17 @@ const getTbodyTableNames = () => {
   return newTbody
 }
 
+const prepareChangeName = ({ nameId, name, order }) => {
+  const asc = order === 'up'
+  const names = changeNamePosition(name, asc)
+  
+  if (!names) {
+    return
+  }
+
+  mountTableNames(names)
+}
+
 const confirmRemoveName = ({ nameId, name }) => {
   const buttonOpen = document.querySelector('button[data-bs-target="#removeName"]')
 
@@ -460,16 +481,32 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
     <tr ${blinkClass} data-name-id="${idx}" data-name="${name}">
       <th scope="row">${position}</th>
       <td>${name}</td>
-      <td>
+      <td class="col col-md-3">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${idx}" data-name="${name}">
           <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
         </div>
       </td>
-      <td>
-        <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${idx}" data-name="${name}">
-          <i class="far fa-trash-alt"></i>
-        </button>
+      <td class="col col-md-2">
+        <div class="row">
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${idx}" data-name="${name}">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down" data-name-id="${idx}" data-name="${name}">
+              <i class="fa-solid fa-caret-down"></i>
+            </button>
+          </div>
+
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up" data-name-id="${idx}" data-name="${name}">
+              <i class="fa-solid fa-caret-up"></i>
+            </button>
+          </div>
+        </div>
       </td>
     </tr>
   `
@@ -477,18 +514,19 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
   return newTR.trim()
 }
 
-const mountTableNames = () => {
+const mountTableNames = (names = null, blink = false) => {
   if (!isNamesPage()) {
     return
   }
   
-  const names = getNames()
+  const namesToIterate = names ?? getNames()
   
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
   
-  for (const idx in names) {
-    const newTR = getNewTableRow(names[idx], +idx)
+  for (const idx in namesToIterate) {
+    const name = namesToIterate[idx]
+    const newTR = getNewTableRow(name, +idx, blink)
     template.innerHTML += newTR
   }
   
@@ -554,6 +592,7 @@ const createEvents = () => {
   const events = [
     ['click',   'button[data-copiar]',                        copyText],
     ['click',   'button[data-remove-confirm]',                removeNameInStorage],
+    ['click',   'button[data-sort-names]',                    sortNamesInTable],
     ['click',   '#plus_one_more_option',                      insertPlusOneOption],
     ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
     ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],

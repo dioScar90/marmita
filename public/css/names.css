@@ -31,6 +31,26 @@
   }
 }
 
+#table_names > tbody:not(.for-empty-table)  {
+  & > tr:first-of-type > td:last-of-type div.col:has(button[data-order="up"]) {
+    cursor: not-allowed;
+
+    & button[data-order="up"] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+
+  & > tr:last-of-type > td:last-of-type div.col:has(button[data-order="down"]) {
+    cursor: not-allowed;
+
+    & button[data-order="down"] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+}
+
 tr.to-remove {
   opacity: 0;
   font-size: 0;
