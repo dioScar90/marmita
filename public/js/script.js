@@ -58,13 +58,13 @@ const getTextoFinal = (pedidos, total) => {
   return textoFinal
 }
 
-const addNewTableRowAfterInStorage = (newName) => {
+const addNewTableRowAfterInStorage = (addedName) => {
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
+  const lastTr = tbody.querySelector('tr:nth-last-child(1)')
 
-  const lastIdx = tbody.childElementCount > 0 ? +tbody.lastElementChild.dataset.nameId : 0
-  const idx = lastIdx + 1
-  const newTR = getNewTableRow(newName, idx)
+  const idx = lastTr ? +lastTr.dataset.nameId + 1 : 0
+  const newTR = getNewTableRow(addedName, idx)
   template.innerHTML = newTR
 
   tbody.append(template.content)
@@ -88,6 +88,25 @@ const addNameInStorage = (e) => {
   form.reset()
 }
 
+const removeTextNodes = ({ childNodes }) => {
+  [...childNodes].forEach(node => {
+    if (!(node instanceof HTMLElement)) {
+      node.remove()
+    }
+  })
+}
+
+const reSortTbody = ({ children }) => {
+  [...children].forEach((tr, idx) => {
+    tr.dataset.nameId = idx
+
+    const allElementsWithNameId = tr.querySelectorAll('[data-name-id]')
+    allElementsWithNameId.forEach(el => el.dataset.nameId = idx)
+    
+    tr.firstElementChild.innerText = zeroAEsquerda(idx + 1)
+  })
+}
+
 const removeNameInStorage = (e) => {
   const button = e.currentTarget
   const modal = button.closest('#removeName')
@@ -101,12 +120,11 @@ const removeNameInStorage = (e) => {
   
   const idx = button.dataset.nameId
   const tr = document.querySelector(`tr[data-name-id="${idx}"`)
-  const tbodyNames = tr.parentElement
-
+  const tbody = tr.closest('tbody')
+  
   tr?.remove()
-  if (tbodyNames.childElementCount === 0) {
-    tbodyNames.remove()
-  }
+  removeTextNodes(tbody)
+  reSortTbody(tbody)
   
   closeBtn?.click()
 }
@@ -323,7 +341,7 @@ const getRadioSalada = (nome) => (`
 const getNewFormElement = (nome) => {
   const salada = getRadioSalada(nome)
 
-  const html = `
+  return `
     <dl class="row">
       <dt class="col-3">
         <label for="formGroupExampleInput_${nome}" class="fw-bold">
@@ -346,8 +364,6 @@ const getNewFormElement = (nome) => {
       </dd>
     </dl>
   `
-
-  return html.trim()
 }
 
 const mountFormElements = () => {
