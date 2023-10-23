@@ -2,6 +2,23 @@
   max-width: 800px;
 }
 
+html {
+  &[lang="en"] body [data-content]::after {
+    content: attr(data-en);
+  }
+
+  &[lang="pt-br"] body [data-content]::after {
+    content: attr(data-pt-br);
+  }
+}
+
+img[src$=".svg"] {
+  max-height: 0.875rem;
+
+  /* Prop abaixo faz a imagem não ultrapassar as dimensões máximas e também mantém as proporções iniciais. */
+  object-fit: contain;
+}
+
 button[disabled] {
   cursor: not-allowed;
 }

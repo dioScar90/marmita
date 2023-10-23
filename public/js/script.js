@@ -1,5 +1,5 @@
 import { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
-import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues } from './utils.js'
+import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
 
 const isPage = (page) => {
   const thisPage = location.pathname.split('/').at(-1)
@@ -302,7 +302,7 @@ const getNewDiv = (value, nome) => {
   return `
     <div class="form-check form-check-inline">
       <input class="form-check-input" type="radio" name="${nome}" id="${idRadio}" value="${value}">
-      <label class="form-check-label" for="${idRadio}">Opção ${value}</label>
+      <label class="form-check-label" for="${idRadio}" data-nomes data-content data-en="Option ${value}" data-pt-br="Opção ${value}"></label>
     </div>
   `
 }
@@ -354,7 +354,7 @@ const onchangeTableNames = (e) => {
 const getRadioSalada = (nome) => (`
   <div class="form-check form-check-inline">
     <input class="form-check-input" type="radio" name="${nome}" id="radio_salada_${nome}" value="salada">
-    <label class="form-check-label" for="radio_salada_${nome}">Salada</label>
+    <label class="form-check-label" for="radio_salada_${nome}" data-nomes data-content data-en="Salad" data-pt-br="Salada"></label>
   </div>
 `)
 
@@ -372,12 +372,12 @@ const getNewFormElement = (nome) => {
       <dd class="col-9">
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="${nome}" id="radio_1_${nome}" value="1">
-          <label class="form-check-label" for="radio_1_${nome}">Opção 1</label>
+          <label class="form-check-label" for="radio_1_${nome}" data-nomes data-content data-en="Option 1" data-pt-br="Opção 1"></label>
         </div>
 
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="${nome}" id="radio_2_${nome}" value="2">
-          <label class="form-check-label" for="radio_2_${nome}">Opção 2</label>
+          <label class="form-check-label" for="radio_2_${nome}" data-nomes data-content data-en="Option 2" data-pt-br="Opção 2"></label>
         </div>
 
         ${salada}
@@ -588,6 +588,30 @@ const mountCssColor = () => {
   document.head.append(style)
 }
 
+const getLang = (defaultLang) => {
+  if (!('lang' in localStorage)) {
+    setLocalStorage('lang', defaultLang)
+  }
+
+  return getLocalStorage('lang')
+}
+
+const changeLang = (e) => {
+  const inputSwitch = e.target
+  
+  setLocalStorage('lang', inputSwitch.value)
+  defineLangHtml(inputSwitch.value)
+}
+
+const defineLangHtml = (lang = null) => {
+  const html = document.querySelector('html')
+  const langValue = lang ?? getLang(html.lang)
+  const input = document.querySelector(`#switch_lang input[value="${langValue}"]`)
+  
+  html.lang = langValue
+  input.checked = true
+}
+
 const createEvents = () => {
   const events = [
     ['click',   'button[data-copiar]',                        copyText],
@@ -596,6 +620,7 @@ const createEvents = () => {
     ['click',   '#plus_one_more_option',                      insertPlusOneOption],
     ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
     ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    ['change',  '#switch_lang',                               changeLang],
     ['reset',   '#form-marmitas',                             formReset],
     ['submit',  '#form-marmitas',                             formSubmit],
     ['submit',  '#adicionar-nome',                            addNameInStorage],
@@ -608,6 +633,7 @@ const createEvents = () => {
 
 
 const init = () => {
+  defineLangHtml()
   mountCssColor()
   mountFormElements()
   mountTableNames()
