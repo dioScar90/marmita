@@ -297,16 +297,6 @@ const formSubmit = e => {
   insertAlertMessage()
 }
 
-const getNewDiv = (value, nome) => {
-  const idRadio = 'radio_' + value + '_' + nome
-  return `
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="${nome}" id="${idRadio}" value="${value}">
-      <label class="form-check-label" for="${idRadio}" data-nomes data-content data-en="Option ${value}" data-pt-br="Opção ${value}"></label>
-    </div>
-  `
-}
-
 const insertPlusOneOption = () => {
   const ultimasDivsValuesNumericos = document.querySelectorAll('[data-nomes] > dl > dd > div:nth-last-child(2)')
 
@@ -351,35 +341,38 @@ const onchangeTableNames = (e) => {
   toggleActiveName(name, isActive)
 }
 
-const getRadioSalada = (nome) => (`
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="${nome}" id="radio_salada_${nome}" value="salada">
-    <label class="form-check-label" for="radio_salada_${nome}" data-nomes data-content data-en="Salad" data-pt-br="Salada"></label>
-  </div>
-`)
+const getNewDivOption = (value, nome) => {
+  const idRadio = 'radio_' + value + '_' + nome
+
+  const dataEn = isNaN(value) ? 'Salad' : 'Option ' + value
+  const dataPtBr = isNaN(value) ? 'Salada' : 'Opção ' + value
+
+  return `
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="${nome}" id="${idRadio}" value="${value}">
+      <label class="form-check-label" for="${idRadio}" data-nomes data-content data-en="${dataEn}" data-pt-br="${dataPtBr}"></label>
+    </div>
+  `
+}
+
+const getOptionSalad = (nome) => getNewDivOption('salada', nome)
 
 const getNewFormElement = (nome) => {
-  const salada = getRadioSalada(nome)
+  const option1 = getNewDivOption(1, nome)
+  const option2 = getNewDivOption(2, nome)
+  const salada = getOptionSalad(nome)
 
   return `
     <dl class="row">
       <dt class="col-3">
-        <label for="formGroupExampleInput_${nome}" class="fw-bold">
+        <label class="fw-bold">
           ${nome}
         </label>
       </dt>
-
+      
       <dd class="col-9">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="${nome}" id="radio_1_${nome}" value="1">
-          <label class="form-check-label" for="radio_1_${nome}" data-nomes data-content data-en="Option 1" data-pt-br="Opção 1"></label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="${nome}" id="radio_2_${nome}" value="2">
-          <label class="form-check-label" for="radio_2_${nome}" data-nomes data-content data-en="Option 2" data-pt-br="Opção 2"></label>
-        </div>
-
+        ${option1}
+        ${option2}
         ${salada}
       </dd>
     </dl>
@@ -478,9 +471,13 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
   const blinkClass = blink ? 'class="blink"' : ''
   
   const newTR = `
-    <tr ${blinkClass} data-name-id="${idx}" data-name="${name}">
-      <th scope="row">${position}</th>
-      <td>${name}</td>
+    <tr ${blinkClass} data-name-id="${idx}" data-name="${name}" draggable="true">
+      <th scope="row">
+        ${position}
+      </th>
+      <td>
+        ${name}
+      </td>
       <td class="col col-md-3">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${idx}" data-name="${name}">
@@ -494,13 +491,11 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
-
           <div class="col px-1">
             <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down" data-name-id="${idx}" data-name="${name}">
               <i class="fa-solid fa-caret-down"></i>
             </button>
           </div>
-
           <div class="col px-1">
             <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up" data-name-id="${idx}" data-name="${name}">
               <i class="fa-solid fa-caret-up"></i>
@@ -531,6 +526,7 @@ const mountTableNames = (names = null, blink = false) => {
   }
   
   tbody.replaceChildren(template.content)
+  startDragEvents()
 }
 
 const getByChecks = (limit) => {

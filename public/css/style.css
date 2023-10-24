@@ -12,6 +12,18 @@ html {
   }
 }
 
+.dragging {
+  opacity: 0.5;
+}
+
+[draggable=true] {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 img[src$=".svg"] {
   max-height: 0.875rem;
 
