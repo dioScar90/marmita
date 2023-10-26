@@ -348,7 +348,7 @@ const getNewDivOption = (value, nome) => {
   const dataPtBr = isNaN(value) ? 'Salada' : 'Opção ' + value
 
   return `
-    <div class="form-check form-check-inline">
+    <div class="form-check form-check-inline option-div">
       <input class="form-check-input" type="radio" name="${nome}" id="${idRadio}" value="${value}">
       <label class="form-check-label" for="${idRadio}" data-nomes data-content data-en="${dataEn}" data-pt-br="${dataPtBr}"></label>
     </div>
@@ -370,7 +370,7 @@ const getNewFormElement = (nome) => {
         </label>
       </dt>
       
-      <dd class="col-9">
+      <dd class="col-9 options-div">
         ${option1}
         ${option2}
         ${salada}

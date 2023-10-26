@@ -1,7 +1,3 @@
-.container {
-  max-width: 800px;
-}
-
 html {
   &[lang="en"] body [data-content]::after {
     content: attr(data-en);
@@ -29,6 +25,19 @@ img[src$=".svg"] {
 
   /* Prop abaixo faz a imagem não ultrapassar as dimensões máximas e também mantém as proporções iniciais. */
   object-fit: contain;
+}
+
+.options-div {
+  display: flex;
+  justify-content: space-between;
+
+  &.option-div {
+    width: auto;
+  }
+
+  @media (width < 768px) {
+    display: block;
+  }
 }
 
 button[disabled] {
