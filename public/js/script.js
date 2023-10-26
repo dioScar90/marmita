@@ -11,6 +11,8 @@ const isPage = (page) => {
   return [page, `${page}.html`].includes(thisPage)
 }
 
+const isCorrectedPage = () => ['index', 'names', 'phones'].some(page => isPage(page))
+
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
 
@@ -627,8 +629,19 @@ const createEvents = () => {
   }
 }
 
+const routerCheck = () => {
+  const acceptedPages = ['index', 'names'/*, 'phones'*/]
+  return acceptedPages.some(page => isPage(page))
+}
 
 const init = () => {
+  const pageOk = routerCheck()
+
+  if (!pageOk) {
+    location = 'index.html'
+    return
+  }
+
   defineLangHtml()
   mountCssColor()
   mountFormElements()
