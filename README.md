@@ -1,15 +1,3 @@
-# Elysia with Bun runtime
+# Marmita
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
-```
-
-## Development
-To start the development server run:
-```bash
-bun run dev
-```
-
-Open http://localhost:3000/ with your browser to see the result.
+This is an web app I developed to help me in doing the lunch orders of mine and of the job's collegue of mine.

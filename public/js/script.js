@@ -11,8 +11,6 @@ const isPage = (page) => {
   return [page, `${page}.html`].includes(thisPage)
 }
 
-const isCorrectedPage = () => ['index', 'names', 'phones'].some(page => isPage(page))
-
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
 
@@ -306,7 +304,7 @@ const insertPlusOneOption = () => {
     const input = div.querySelector('input')
     const newValue = +input.value + 1
     const nome = input.name
-    const newDiv = getNewDiv(newValue, nome)
+    const newDiv = getNewDivOption(newValue, nome)
 
     div.insertAdjacentHTML('afterend', newDiv)
   })
