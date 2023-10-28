@@ -93,6 +93,22 @@ const addNameInStorage = (e) => {
   form.reset()
 }
 
+const focusInputText = (e) => {
+  const modal = e.currentTarget
+  const input = modal.querySelector('input[name="name"]')
+  
+  if (e.target !== modal || !modal.classList.contains('show')) {
+    return
+  }
+
+  // if (e.target === input) {
+  //   e.stopPropagation()
+  //   return
+  // }
+
+  setTimeout(() => input.focus(), 500)
+}
+
 const removeTextNodes = ({ childNodes }) => {
   [...childNodes].forEach(node => {
     if (!(node instanceof HTMLElement)) {
@@ -610,20 +626,22 @@ const defineLangHtml = (lang = null) => {
 
 const createEvents = () => {
   const events = [
-    ['click',   'button[data-copiar]',                        copyText],
-    ['click',   'button[data-remove-confirm]',                removeNameInStorage],
-    ['click',   'button[data-sort-names]',                    sortNamesInTable],
-    ['click',   '#plus_one_more_option',                      insertPlusOneOption],
-    ['click',   '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
-    ['change',  '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
-    ['change',  '#switch_lang',                               changeLang],
-    ['reset',   '#form-marmitas',                             formReset],
-    ['submit',  '#form-marmitas',                             formSubmit],
-    ['submit',  '#adicionar-nome',                            addNameInStorage],
+    ['click',         'button[data-copiar]',                        copyText],
+    ['click',         'button[data-remove-confirm]',                removeNameInStorage],
+    ['click',         'button[data-sort-names]',                    sortNamesInTable],
+    ['click',         '#plus_one_more_option',                      insertPlusOneOption],
+    ['click',         '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+    ['change',        '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    ['change',        '#switch_lang',                               changeLang],
+    ['reset',         '#form-marmitas',                             formReset],
+    ['submit',        '#form-marmitas',                             formSubmit],
+    ['submit',        '#adicionar-nome',                            addNameInStorage],
+    ['transitionend', '#addName',                            focusInputText, { once: false }],
+    // ['animationend', '#addName',                            focusInputText],
   ]
 
-  for (const [ eventType, selector, func ] of events) {
-    listenerCreator.create(eventType, selector, func)
+  for (const [ eventType, selector, func, options = {} ] of events) {
+    listenerCreator.create(eventType, selector, func, options)
   }
 }
 
