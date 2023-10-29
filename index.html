@@ -98,11 +98,14 @@
 
       <div class="row justify-content-center" id="botoes-form">
         <div class="col-12 col-md-6 my-1 row justify-content-center">
-          <div class="btn-group col-9" role="group" aria-label="Basic mixed styles example">
+          <div class="btn-group col-12" role="group" aria-label="Basic mixed styles example">
             <button type="reset" class="btn btn-outline-warning text-nowrap" data-content data-en="Clear" data-pt-br="Limpar" disabled>
               <i class="fas fa-list-ul"></i>
-              
             </button>
+
+            <button type="button" class="btn btn-outline-light text-nowrap" id="plus_one_more_option" data-content data-en="+1 op." data-pt-br="+1 op." disabled>
+            </button>
+
             <button type="submit" class="btn btn-primary text-nowrap" disabled>
               <span data-content data-en="Generate" data-pt-br="Gerar"></span>
               <i class="fas fa-utensils"></i>
@@ -110,7 +113,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-md-6 my-1 row justify-content-center">
+        <div class="col-12 col-md-6 my-1 row justify-content-center" hidden>
           <div class="btn-group col-9" role="group" aria-label="Basic mixed styles example">
             <button type="button" class="btn btn-outline-light text-nowrap" id="plus_one_more_option" data-content data-en="Option" data-pt-br="Opção" disabled>
               <i class="fa-solid fa-plus"></i>

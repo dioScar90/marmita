@@ -360,8 +360,8 @@ const onchangeTableNames = (e) => {
 const getNewDivOption = (value, nome) => {
   const idRadio = 'radio_' + value + '_' + nome
 
-  const dataEn = isNaN(value) ? 'Salad' : 'Option ' + value
-  const dataPtBr = isNaN(value) ? 'Salada' : 'Opção ' + value
+  const dataEn = isNaN(value) ? 'Salad only' : 'Option ' + value
+  const dataPtBr = isNaN(value) ? 'Só salada' : 'Opção ' + value
 
   return `
     <div class="form-check form-check-inline option-div">
