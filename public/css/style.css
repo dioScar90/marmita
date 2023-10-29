@@ -20,6 +20,44 @@ html {
   }
 }
 
+#switch_lang {
+  position: absolute;
+  width: 30%;
+  left: 35%;
+  padding-top: var(--bs-navbar-brand-padding-y);
+  padding-bottom: var(--bs-navbar-brand-padding-y);
+  top: 0;
+
+  [class^="div-lang"] {
+    width: 100px;
+    display: flex;
+    align-items: center;
+
+    &.div-lang-en {
+      justify-content: end;
+    }
+
+    &.div-lang-pt-br {
+      justify-content: start;
+    }
+
+    @media (width < 768px) {
+      width: 50px;
+    }
+  }
+
+  @media (width < 992px) {
+    width: 40%;
+    left: 30%;
+  }
+
+  @media (width < 768px) {
+    & .lang-description {
+      display: none !important;
+    }
+  }
+}
+
 img[src$=".svg"] {
   max-height: 0.875rem;
 

@@ -636,8 +636,7 @@ const createEvents = () => {
     ['reset',         '#form-marmitas',                             formReset],
     ['submit',        '#form-marmitas',                             formSubmit],
     ['submit',        '#adicionar-nome',                            addNameInStorage],
-    ['transitionend', '#addName',                            focusInputText, { once: false }],
-    // ['animationend', '#addName',                            focusInputText],
+    ['transitionend', '#addName',                                   focusInputText],
   ]
 
   for (const [ eventType, selector, func, options = {} ] of events) {
