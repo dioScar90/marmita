@@ -1,5 +1,6 @@
 import { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
-import { zeroAEsquerda, getHoraFormatada, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
+import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
+import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 
 const isPage = (page) => {
   const thisPage = location.pathname.split('/').at(-1)
@@ -542,7 +543,7 @@ const mountTableNames = (names = null, blink = false) => {
   }
   
   tbody.replaceChildren(template.content)
-  startDragEvents()
+  // startDragEvents()
 }
 
 const getByChecks = (limit) => {
@@ -636,6 +637,11 @@ const createEvents = () => {
     ['reset',         '#form-marmitas',                             formReset],
     ['submit',        '#form-marmitas',                             formSubmit],
     ['submit',        '#adicionar-nome',                            addNameInStorage],
+
+    ['dragstart',     '#table_names > tbody:not(.for-empty-table)', startingDrag],
+    ['dragend',       '#table_names > tbody:not(.for-empty-table)', endingDrag],
+    ['dragover',      '#table_names > tbody:not(.for-empty-table)', movingDragElement],
+    
     ['transitionend', '#addName',                                   focusInputText],
   ]
 
