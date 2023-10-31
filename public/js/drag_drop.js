@@ -1,22 +1,9 @@
-import { replaceAllNames } from './utils.js'
+import { changeNameMoreThenTwoPositions } from './names.js'
 
-const updateAllNamesByTable = (table) => {
-  const tableRows = table.querySelectorAll(':scope > tr')
-  const names = []
-
-  for (const tr of tableRows) {
-    const input = tr.querySelector('[type="checkbox"]')
-
-    const name = tr.dataset.name
-    const isActive = input.checked
-    const newName = {name, isActive}
-
-    tr.dataset.nameId = tr.sectionRowIndex
-    tr.firstElementChild.innerText = (tr.sectionRowIndex + 1).toString().padStart(2, '0')
-    names.push(newName)
-  }
-
-  replaceAllNames(names)
+const updateAllNamesByTable = (tr) => {
+  const idModifiedTr = tr.dataset.nameId
+  const idBeforeModified = tr.previousElementSibling?.dataset.nameId
+  return changeNameMoreThenTwoPositions(idBeforeModified, idModifiedTr)
 }
 
 const startingDrag = (e) => {
@@ -27,8 +14,7 @@ const endingDrag = (e) => {
   const dragging = e.target
   dragging.classList.remove('dragging')
 
-  const table = e.currentTarget
-  updateAllNamesByTable(table)
+  return updateAllNamesByTable(dragging)
 }
 
 const getNewPosition = (item, posY) => {

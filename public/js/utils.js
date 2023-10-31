@@ -22,11 +22,14 @@ const setLocalStorage = (key, value) => localStorage.setItem(key, JSON.stringify
 
 const replaceAllNames = (names) => localStorage.setItem('names', JSON.stringify(names))
 
-const getFormValues = (form) => {
+const getFormValues = (form, getAllTypes = false) => {
   const formData = new FormData(form)
   const values = {}
 
   for (const [name, value] of formData) {
+    if (getAllTypes && typeof value !== 'string') {
+      continue
+    }
     values[name] = value.trim()
   }
 

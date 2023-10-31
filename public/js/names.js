@@ -3,7 +3,7 @@ import { getLocalStorage, setLocalStorage } from './utils.js'
 const Names = (() => {
   const getNames = () => 'names' in localStorage ? getLocalStorage('names') : []
 
-  const getAscValue = () => {
+  const _getAscValue = () => {
     const actualAsc = 'sort' in localStorage ? getLocalStorage('sort') : false
 
     const asc = !actualAsc
@@ -12,25 +12,25 @@ const Names = (() => {
     return asc
   }
 
-  const compareName = (name1, name2, asc) => {
+  const _compareName = (n1, n2, asc) => {
     if (asc) {
-      return name1.name.localeCompare(name2.name)
+      return n1.name.localeCompare(n2.name)
     }
 
-    return name2.name.localeCompare(name1.name)
+    return n2.name.localeCompare(n1.name)
   }
 
   const sortNames = () => {
-    const asc = getAscValue()
+    const asc = _getAscValue()
     const names = getNames()
 
-    const sortedNames = names.toSorted((n1, n2) => compareName(n1, n2, asc))
+    const sortedNames = names.toSorted((n1, n2) => _compareName(n1, n2, asc))
     setLocalStorage('names', sortedNames)
 
     return sortedNames
   }
 
-  const checkNameLimit = (actualNames, idx, up) => {
+  const _checkNameLimit = (actualNames, idx, up) => {
     if (up === true && actualNames[idx] === actualNames.at(0)) {
       return true
     }
@@ -42,14 +42,14 @@ const Names = (() => {
     return false
   }
 
-  const changeNamePosition = (nameToChangePosition, up) => {
-    const { actualNames, idx } = _findName(nameToChangePosition)
+  const changeNamePosition = (idToChangePosition, up) => {
+    const { actualNames, idx } = _findName(idToChangePosition)
 
     if (idx === -1) {
       return false
     }
 
-    const nameIsAlreadyInTheLimit = checkNameLimit(actualNames, idx, up)
+    const nameIsAlreadyInTheLimit = _checkNameLimit(actualNames, idx, up)
 
     if (nameIsAlreadyInTheLimit) {
       return false
@@ -65,11 +65,45 @@ const Names = (() => {
     return newNames
   }
 
+  const _filaDumaEgua = (idx, idFirst, actualNames) => {
+    const changedItem = {...actualNames[idx]}
+
+    if (!idFirst) {
+      const tempNames = actualNames.toSpliced(idx, 1)
+      return tempNames.toSpliced(0, 0, changedItem)
+    }
+
+    const { _, idxFirst } = _findName(idFirst)
+    const tempNames = actualNames.toSpliced(idxFirst, 0, changedItem)
+
+    return tempNames.toSpliced(idx, 1)
+  }
+
+  const changeNameMoreThenTwoPositions = (idFirst, idAfter) => {
+    const { actualNames, idx } = _findName(idAfter)
+
+    if (idx === -1) {
+      return false
+    }
+
+    const newNames = _filaDumaEgua(idx, idFirst, actualNames)
+
+    console.log('newNames', newNames)
+
+    setLocalStorage('names', newNames)
+    return newNames
+  }
+
   const setNames = (...values) => {
     try {
       const actualNames = getNames() ?? []
   
-      const namesToAppend = values.map(name => ({ name, isActive: true }))
+      const namesToAppend = values.map(name => {
+        const isActive = true
+        const id = self.crypto.randomUUID()
+
+        return { id, name, isActive }
+      })
       const newNames = [ ...actualNames, ...namesToAppend ]
   
       _updateNames(newNames)
@@ -80,8 +114,8 @@ const Names = (() => {
     }
   }
 
-  const toggleActiveName = (nameToToggle, isActive = false) => {
-    const { actualNames, idx } = _findName(nameToToggle)
+  const toggleActiveName = (idToToggle, isActive = false) => {
+    const { actualNames, idx } = _findName(idToToggle)
 
     if (idx === -1) {
       return false
@@ -93,8 +127,8 @@ const Names = (() => {
     return true
   }
 
-  const removeName = nameToRemove => {
-    const { actualNames, idx } = _findName(nameToRemove)
+  const removeName = idToRemove => {
+    const { actualNames, idx } = _findName(idToRemove)
 
     if (idx === -1) {
       return false
@@ -106,16 +140,15 @@ const Names = (() => {
     return true
   }
 
-  const _findName = nameToFind => {
+  const _findName = idToFind => {
     const actualNames = getNames() ?? []
-    const idx = actualNames.findIndex(({ name }) => name === nameToFind)
+    const idx = actualNames.findIndex(({ id }) => id === idToFind)
     return { actualNames, idx }
   }
 
   const _updateNames = names => setLocalStorage('names', names)
 
-  return { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition }
+  return { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition, changeNameMoreThenTwoPositions }
 })()
 
-const { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition } = Names
-export { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition }
+export const { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition, changeNameMoreThenTwoPositions } = Names

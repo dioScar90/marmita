@@ -145,7 +145,7 @@ const removeNameInStorage = (e) => {
   const modal = button.closest('#removeName')
   const closeBtn = modal.querySelector('button.btn-close')
 
-  const removed = removeName(button.dataset.name)
+  const removed = removeName(button.dataset.nameId)
 
   if (!removed) {
     return
@@ -353,9 +353,9 @@ const onchangeTableNames = (e) => {
   }
   
   const isActive = inputRadio.checked
-  const name = inputRadio.dataset.name
+  const id = inputRadio.dataset.nameId
 
-  toggleActiveName(name, isActive)
+  toggleActiveName(id, isActive)
 }
 
 const getNewDivOption = (value, nome) => {
@@ -453,9 +453,9 @@ const getTbodyTableNames = () => {
   return newTbody
 }
 
-const prepareChangeName = ({ nameId, name, order }) => {
+const prepareChangeName = ({ nameId, order }) => {
   const asc = order === 'up'
-  const names = changeNamePosition(name, asc)
+  const names = changeNamePosition(nameId, asc)
   
   if (!names) {
     return
@@ -479,7 +479,7 @@ const confirmRemoveName = ({ nameId, name }) => {
   buttonOpen.click()
 }
 
-const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
+const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   const position = zeroAEsquerda(idx + 1)
 
   const checked = isActive ? 'checked' : ''
@@ -488,7 +488,7 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
   const blinkClass = blink ? 'class="blink"' : ''
   
   const newTR = `
-    <tr ${blinkClass} data-name-id="${idx}" data-name="${name}" draggable="true">
+    <tr ${blinkClass} data-name-id="${id}" data-name="${name}" draggable="true">
       <th scope="row">
         ${position}
       </th>
@@ -497,24 +497,24 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
       </td>
       <td class="col col-md-3">
         <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${idx}" data-name="${name}">
+          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${id}" data-name="${name}">
           <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
         </div>
       </td>
       <td class="col col-md-2">
         <div class="row">
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${idx}" data-name="${name}">
+            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${id}" data-name="${name}">
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down" data-name-id="${idx}" data-name="${name}">
+            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down" data-name-id="${id}" data-name="${name}">
               <i class="fa-solid fa-caret-down"></i>
             </button>
           </div>
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up" data-name-id="${idx}" data-name="${name}">
+            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up" data-name-id="${id}" data-name="${name}">
               <i class="fa-solid fa-caret-up"></i>
             </button>
           </div>
@@ -524,6 +524,16 @@ const getNewTableRow = ({ name, isActive }, idx, blink = false) => {
   `
 
   return newTR.trim()
+}
+
+const getTableRow = (tbody, idx) => {
+  const tr = tbody.children[idx]
+
+  if (tr) {
+    return tr
+  }
+
+  const newTR = getNewTableRow(name, +idx, blink)
 }
 
 const mountTableNames = (names = null, blink = false) => {
@@ -536,14 +546,51 @@ const mountTableNames = (names = null, blink = false) => {
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
   
-  for (const idx in namesToIterate) {
-    const name = namesToIterate[idx]
-    const newTR = getNewTableRow(name, +idx, blink)
-    template.innerHTML += newTR
+  for (const i in namesToIterate) {
+    const idx = +i
+    const tr = tbody.children[idx]?.cloneNode(true)
+    
+    if (!tr) {
+      const name = namesToIterate[idx]
+      const newTR = getNewTableRow(name, idx, blink)
+      template.innerHTML += newTR
+      continue
+    }
+    
+    if (tr?.dataset.nameId === namesToIterate[idx].id) {
+      template.content.append(tr)
+      continue
+    }
+    
+    const elementsToChange = tr.querySelectorAll('[data-name-id][data-name]')
+
+    elementsToChange.forEach(element => {
+      element.dataset.nameId = namesToIterate[idx].id
+      element.dataset.name = namesToIterate[idx].name
+    })
+    
+    tr.dataset.nameId = namesToIterate[idx].id
+    tr.dataset.name = namesToIterate[idx].name
+
+    tr.firstElementChild.innerText = (idx + 1).toString().padStart(2, '0')
+    tr.children[1].innerText = namesToIterate[idx].name
+
+    template.content.append(tr)
   }
   
   tbody.replaceChildren(template.content)
-  // startDragEvents()
+}
+
+const endingDragController = (e) => {
+  const names = endingDrag(e)
+
+  console.log('names', names)
+
+  if (!names) {
+    return
+  }
+
+  mountTableNames(names)
 }
 
 const getByChecks = (limit) => {
@@ -639,7 +686,7 @@ const createEvents = () => {
     ['submit',        '#adicionar-nome',                            addNameInStorage],
 
     ['dragstart',     '#table_names > tbody:not(.for-empty-table)', startingDrag],
-    ['dragend',       '#table_names > tbody:not(.for-empty-table)', endingDrag],
+    ['dragend',       '#table_names > tbody:not(.for-empty-table)', endingDragController],
     ['dragover',      '#table_names > tbody:not(.for-empty-table)', movingDragElement],
     
     ['transitionend', '#addName',                                   focusInputText],
