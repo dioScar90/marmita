@@ -1,11 +1,34 @@
+import { replaceAllNames } from './utils.js'
+
+const updateAllNamesByTable = (table) => {
+  const tableRows = table.querySelectorAll(':scope > tr')
+  const names = []
+
+  for (const tr of tableRows) {
+    const input = tr.querySelector('[type="checkbox"]')
+
+    const name = tr.dataset.name
+    const isActive = input.checked
+    const newName = {name, isActive}
+
+    tr.dataset.nameId = tr.sectionRowIndex
+    tr.firstElementChild.innerText = (tr.sectionRowIndex + 1).toString().padStart(2, '0')
+    names.push(newName)
+  }
+
+  replaceAllNames(names)
+}
+
 const startingDrag = (e) => {
-  console.log('starting', e.target.sectionRowIndex)
   e.target.classList.add('dragging')
 }
 
 const endingDrag = (e) => {
-  console.log('ending', e.target.sectionRowIndex, e.target.dataset)
-  e.target.classList.remove('dragging')
+  const dragging = e.target
+  dragging.classList.remove('dragging')
+
+  const table = e.currentTarget
+  updateAllNamesByTable(table)
 }
 
 const getNewPosition = (item, posY) => {

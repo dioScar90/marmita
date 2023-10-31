@@ -20,6 +20,8 @@ const listenerCreator = (() => {
 const getLocalStorage = (key) => JSON.parse(localStorage.getItem(key))
 const setLocalStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value))
 
+const replaceAllNames = (names) => localStorage.setItem('names', JSON.stringify(names))
+
 const getFormValues = (form) => {
   const formData = new FormData(form)
   const values = {}
@@ -41,4 +43,4 @@ const getHoraFormatada = (data) => {
   return horas(data) + 'h' + minutos(data) + 'm' + segundos(data)
 }
 
-export { zeroAEsquerda, getHoraFormatada, listenerCreator, getLocalStorage, setLocalStorage, getFormValues }
+export { zeroAEsquerda, getHoraFormatada, listenerCreator, getLocalStorage, setLocalStorage, replaceAllNames, getFormValues }
