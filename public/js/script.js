@@ -380,14 +380,12 @@ const getNewFormElement = (nome) => {
   const salada = getOptionSalad(nome)
 
   return `
-    <dl class="row">
-      <dt class="col-3">
-        <label class="fw-bold">
-          ${nome}
-        </label>
+    <dl class="row justify-content-center">
+      <dt class="col-4 col-md-2">
+        <label>${nome}</label>
       </dt>
       
-      <dd class="col-9 options-div">
+      <dd class="col-8 col-md">
         ${option1}
         ${option2}
         ${salada}
@@ -609,6 +607,7 @@ const getByChecks = (limit) => {
 
 const getStylesheetColors = () => {
   const radioBeforeContent = `\\2713`
+  const whiteSpace = `\\0000a0`
   const stylesheets = getByChecks(10)
   
   return `
@@ -623,7 +622,7 @@ const getStylesheetColors = () => {
           color: var(--color-checked-mark);
           
           &::before {
-            content: '${radioBeforeContent}';
+            content: '${radioBeforeContent}' '${whiteSpace}';
           }
         }
         
