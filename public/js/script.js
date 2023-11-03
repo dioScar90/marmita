@@ -679,9 +679,12 @@ const createEvents = () => {
     ['click',         'button[data-sort-names]',                    sortNamesInTable],
     ['click',         '#plus_one_more_option',                      insertPlusOneOption],
     ['click',         '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+
     ['change',        '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
     ['change',        '#switch_lang',                               changeLang],
+
     ['reset',         '#form-marmitas',                             formReset],
+
     ['submit',        '#form-marmitas',                             formSubmit],
     ['submit',        '#adicionar-nome',                            addNameInStorage],
 
