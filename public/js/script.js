@@ -2,6 +2,8 @@ import { getNames, setNames, toggleActiveName, removeName, sortNames, changeName
 import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 
+const MAX_TYPES = 5
+
 const isPage = (page) => {
   const thisPage = location.pathname.split('/').at(-1)
 
@@ -315,7 +317,13 @@ const formSubmit = e => {
 }
 
 const insertPlusOneOption = () => {
-  const ultimasDivsValuesNumericos = document.querySelectorAll('[data-nomes] > dl > dd > div:nth-last-child(2)')
+  const selector = `[data-nomes] > dl > dd:not(:has(:nth-child(${MAX_TYPES}))) > div:nth-last-child(2)`
+  const ultimasDivsValuesNumericos = document.querySelectorAll(selector)
+  
+  if (ultimasDivsValuesNumericos.length === 0) {
+    alert('Máximo de opção já atingidas')
+    return
+  }
 
   ultimasDivsValuesNumericos.forEach(div => {
     const input = div.querySelector('input')
@@ -385,7 +393,7 @@ const getNewFormElement = (nome) => {
         <label>${nome}</label>
       </dt>
       
-      <dd class="col-8 col-md">
+      <dd class="col-8 col-md-auto">
         ${option1}
         ${option2}
         ${salada}
@@ -608,7 +616,7 @@ const getByChecks = (limit) => {
 const getStylesheetColors = () => {
   const radioBeforeContent = `\\2713`
   const whiteSpace = `\\0000a0`
-  const stylesheets = getByChecks(10)
+  const stylesheets = getByChecks(MAX_TYPES)
   
   return `
     [data-nomes] > dl {
