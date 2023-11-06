@@ -143,22 +143,25 @@ const removeTr = async (tr) => {
 }
 
 const removeNameInStorage = (e) => {
-  const button = e.currentTarget
-  const modal = button.closest('#removeName')
-  const closeBtn = modal.querySelector('button.btn-close')
-
-  const removed = removeName(button.dataset.nameId)
-
-  if (!removed) {
-    return
+  try {
+    const button = e.currentTarget
+    const modal = button.closest('#removeName')
+    const closeBtn = modal.querySelector('button.btn-close')
+  
+    const id = button.dataset?.nameId
+    const removed = removeName(id)
+  
+    if (!removed) {
+      return
+    }
+    
+    const tr = document.querySelector(`tr[data-name-id="${id}"`)
+    
+    removeTr(tr)
+    closeBtn?.click()
+  } catch (err) {
+    alert(err.toString())
   }
-  
-  const idx = button.dataset.nameId
-  const tr = document.querySelector(`tr[data-name-id="${idx}"`)
-  
-  removeTr(tr)
-  
-  closeBtn?.click()
 }
 
 const sortNamesInTable = () => {
