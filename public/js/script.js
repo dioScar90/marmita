@@ -532,38 +532,28 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   return newTR.trim()
 }
 
-const getTableRow = (tbody, idx) => {
-  const tr = tbody.children[idx]
-
-  if (tr) {
-    return tr
-  }
-
-  const newTR = getNewTableRow(name, +idx, blink)
-}
-
-const mountTableNames = (names = null, blink = false) => {
+const mountTableNames = (namesArg = null, blink = false) => {
   if (!isNamesPage()) {
     return
   }
   
-  const namesToIterate = names ?? getNames()
+  const names = namesArg ?? getNames()
   
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
   
-  for (const i in namesToIterate) {
-    const idx = +i
-    const tr = tbody.children[idx]?.cloneNode(true)
+  for (const idx in names) {
+    const i = +idx
+    const tr = tbody.children[i]?.cloneNode(true)
     
     if (!tr) {
-      const name = namesToIterate[idx]
-      const newTR = getNewTableRow(name, idx, blink)
+      const name = names[i]
+      const newTR = getNewTableRow(name, i, blink)
       template.innerHTML += newTR
       continue
     }
     
-    if (tr?.dataset.nameId === namesToIterate[idx].id) {
+    if (tr?.dataset.nameId === names[i].id) {
       template.content.append(tr)
       continue
     }
@@ -571,15 +561,15 @@ const mountTableNames = (names = null, blink = false) => {
     const elementsToChange = tr.querySelectorAll('[data-name-id][data-name]')
 
     elementsToChange.forEach(element => {
-      element.dataset.nameId = namesToIterate[idx].id
-      element.dataset.name = namesToIterate[idx].name
+      element.dataset.nameId = names[i].id
+      element.dataset.name = names[i].name
     })
     
-    tr.dataset.nameId = namesToIterate[idx].id
-    tr.dataset.name = namesToIterate[idx].name
+    tr.dataset.nameId = names[i].id
+    tr.dataset.name = names[i].name
 
-    tr.firstElementChild.innerText = (idx + 1).toString().padStart(2, '0')
-    tr.children[1].innerText = namesToIterate[idx].name
+    tr.firstElementChild.innerText = (i + 1).toString().padStart(2, '0')
+    tr.children[1].innerText = names[i].name
 
     template.content.append(tr)
   }
@@ -589,9 +579,7 @@ const mountTableNames = (names = null, blink = false) => {
 
 const endingDragController = (e) => {
   const names = endingDrag(e)
-
-  console.log('names', names)
-
+  
   if (!names) {
     return
   }

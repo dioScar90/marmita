@@ -1,8 +1,8 @@
 import { changeNameMoreThenTwoPositions } from './names.js'
 
 const updateAllNamesByTable = (tr) => {
-  const idModifiedTr = tr.dataset.nameId
   const idBeforeModified = tr.previousElementSibling?.dataset.nameId
+  const idModifiedTr = tr.dataset.nameId
   return changeNameMoreThenTwoPositions(idBeforeModified, idModifiedTr)
 }
 

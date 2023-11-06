@@ -43,7 +43,7 @@ const Names = (() => {
   }
 
   const changeNamePosition = (idToChangePosition, up) => {
-    const { actualNames, idx } = _findName(idToChangePosition)
+    const [actualNames, idx] = _findName(idToChangePosition)
 
     if (idx === -1) {
       return false
@@ -65,31 +65,31 @@ const Names = (() => {
     return newNames
   }
 
-  const _filaDumaEgua = (idx, idFirst, actualNames) => {
-    const changedItem = {...actualNames[idx]}
+  const _filaDumaEgua = (idBefore, idxAfter, actualNames) => {
+    const itemAfter = {...actualNames[idxAfter]}
 
-    if (!idFirst) {
-      const tempNames = actualNames.toSpliced(idx, 1)
-      return tempNames.toSpliced(0, 0, changedItem)
+    if (!idBefore) {
+      const tempNames = actualNames.toSpliced(idxAfter, 1)
+      const newNames = tempNames.toSpliced(0, 0, itemAfter)
+      return newNames
     }
 
-    const { _, idxFirst } = _findName(idFirst)
-    const tempNames = actualNames.toSpliced(idxFirst, 0, changedItem)
+    const [_, idxBefore] = _findName(idBefore)
+    const tempNames = actualNames.toSpliced(idxBefore + 1, 0, itemAfter)
 
-    return tempNames.toSpliced(idx, 1)
+    const newNames = tempNames.toSpliced(idxAfter, 1)
+    return newNames
   }
 
-  const changeNameMoreThenTwoPositions = (idFirst, idAfter) => {
-    const { actualNames, idx } = _findName(idAfter)
-
-    if (idx === -1) {
+  const changeNameMoreThenTwoPositions = (idBefore, idAfter) => {
+    const [actualNames, idxAfter] = _findName(idAfter)
+    
+    if (idxAfter === -1) {
       return false
     }
-
-    const newNames = _filaDumaEgua(idx, idFirst, actualNames)
-
-    console.log('newNames', newNames)
-
+    
+    const newNames = _filaDumaEgua(idBefore, idxAfter, actualNames)
+    
     setLocalStorage('names', newNames)
     return newNames
   }
@@ -115,7 +115,7 @@ const Names = (() => {
   }
 
   const toggleActiveName = (idToToggle, isActive = false) => {
-    const { actualNames, idx } = _findName(idToToggle)
+    const [actualNames, idx] = _findName(idToToggle)
 
     if (idx === -1) {
       return false
@@ -128,7 +128,7 @@ const Names = (() => {
   }
 
   const removeName = idToRemove => {
-    const { actualNames, idx } = _findName(idToRemove)
+    const [actualNames, idx] = _findName(idToRemove)
 
     if (idx === -1) {
       return false
@@ -143,7 +143,7 @@ const Names = (() => {
   const _findName = idToFind => {
     const actualNames = getNames() ?? []
     const idx = actualNames.findIndex(({ id }) => id === idToFind)
-    return { actualNames, idx }
+    return [actualNames, idx]
   }
 
   const _updateNames = names => setLocalStorage('names', names)
