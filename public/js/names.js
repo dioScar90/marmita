@@ -12,14 +12,8 @@ const Names = (() => {
     return asc
   }
 
-  const _compareName = (n1, n2, asc) => {
-    if (asc) {
-      return n1.name.localeCompare(n2.name)
-    }
-
-    return n2.name.localeCompare(n1.name)
-  }
-
+  const _compareName = (n1, n2, asc) => asc ? n1.name.localeCompare(n2.name) : n2.name.localeCompare(n1.name)
+  
   const sortNames = () => {
     const asc = _getAscValue()
     const names = getNames()
@@ -29,86 +23,41 @@ const Names = (() => {
 
     return sortedNames
   }
+  
+  const _filaDumaEgua = (id, oldIdx, newIdx, actualNames) => {
+    const item = {...actualNames[oldIdx]}
 
-  const _checkNameLimit = (actualNames, idx, up) => {
-    if (up === true && actualNames[idx] === actualNames.at(0)) {
-      return true
-    }
-
-    if (up === false && actualNames[idx] === actualNames.at(-1)) {
-      return true
-    }
-
-    return false
-  }
-
-  const changeNamePosition = (idToChangePosition, up) => {
-    const [actualNames, idx] = _findName(idToChangePosition)
-
-    if (idx === -1) {
-      return false
-    }
-
-    const nameIsAlreadyInTheLimit = _checkNameLimit(actualNames, idx, up)
-
-    if (nameIsAlreadyInTheLimit) {
-      return false
-    }
-
-    const start = up === true ? idx - 1 : idx
-    const deleteCount = 2
-    const firstItem = up === true ? actualNames[idx] : actualNames[idx + 1]
-    const secondItem = up === true ? actualNames[idx - 1] : actualNames[idx]
-    const newNames = actualNames.toSpliced(start, deleteCount, {...firstItem}, {...secondItem})
+    const tempNames = actualNames.toSpliced(oldIdx, 1)
+    const newNames = tempNames.toSpliced(newIdx, 0, item)
     
-    setLocalStorage('names', newNames)
     return newNames
   }
 
-  const _filaDumaEgua = (idBefore, idxAfter, actualNames) => {
-    const itemAfter = {...actualNames[idxAfter]}
-
-    if (!idBefore) {
-      const tempNames = actualNames.toSpliced(idxAfter, 1)
-      const newNames = tempNames.toSpliced(0, 0, itemAfter)
-      return newNames
-    }
-
-    const [_, idxBefore] = _findName(idBefore)
-    const tempNames = actualNames.toSpliced(idxBefore + 1, 0, itemAfter)
-
-    const newNames = tempNames.toSpliced(idxAfter, 1)
-    return newNames
-  }
-
-  const changeNameMoreThenTwoPositions = (idBefore, idAfter) => {
-    const [actualNames, idxAfter] = _findName(idAfter)
+  const changeNamePosition = (id, newIdx) => {
+    const [actualNames, oldIdx] = _findName(id)
     
-    if (idxAfter === -1) {
+    if (oldIdx === -1 || newIdx === oldIdx) {
       return false
     }
     
-    const newNames = _filaDumaEgua(idBefore, idxAfter, actualNames)
+    const newNames = _filaDumaEgua(id, oldIdx, newIdx, actualNames)
+    _updateNames(newNames)
     
-    setLocalStorage('names', newNames)
     return newNames
   }
 
-  const setNames = (...values) => {
+  const setNewName = (name) => {
     try {
       const actualNames = getNames() ?? []
-  
-      const namesToAppend = values.map(name => {
-        const isActive = true
-        const id = self.crypto.randomUUID()
-
-        return { id, name, isActive }
-      })
-      const newNames = [ ...actualNames, ...namesToAppend ]
-  
-      _updateNames(newNames)
-  
-      return namesToAppend[0]
+      
+      const isActive = true
+      const id = self.crypto.randomUUID()
+      const nameToAppend = { id, name, isActive }
+      
+      actualNames.push(nameToAppend)
+      _updateNames(actualNames)
+      
+      return nameToAppend
     } catch (err) {
       return false
     }
@@ -137,7 +86,7 @@ const Names = (() => {
     const newNames = actualNames.toSpliced(idx, 1)
     _updateNames(newNames)
 
-    return true
+    return newNames
   }
 
   const _findName = idToFind => {
@@ -148,7 +97,7 @@ const Names = (() => {
 
   const _updateNames = names => setLocalStorage('names', names)
 
-  return { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition, changeNameMoreThenTwoPositions }
+  return { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition }
 })()
 
-export const { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition, changeNameMoreThenTwoPositions } = Names
+export const { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } = Names

@@ -5,21 +5,23 @@ This is an web app I developed to help me in doing the lunch orders of mine and 
 Want to mock your data manually? Copy/paste it on your browser console and write the names you want passing them by an array: string[] as a parameter of mockData's function:
 
 ```
-const mockData = (names) => {
-    const objNames = names.reduce((acc, name) => {
-        const isActive = true
-        const newName = {name, isActive}
-        acc.push(newName)
+const mockData = (values) => {
+  const names = []
 
-        return acc
-    }, [])
+  for (const name of values) {
+    const isActive = true
+    const id = self.crypto.randomUUID()
+    const newName = { id, name, isActive }
 
-    localStorage.setItem('names', JSON.stringify(objNames))
+    names.push(newName)
+  }
+
+  localStorage.setItem('names', JSON.stringify(names))
 }
 
 const names = [/* Type here the names you want to mock... */]
 
-mockData(names)
+mockData(names.sort())
 ```
 
 Now you can order your lunch, and also add/remove or enable/disable names. :)

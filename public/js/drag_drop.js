@@ -1,10 +1,6 @@
-import { changeNameMoreThenTwoPositions } from './names.js'
+import { changeNamePosition } from './names.js'
 
-const updateAllNamesByTable = (tr) => {
-  const idBeforeModified = tr.previousElementSibling?.dataset.nameId
-  const idModifiedTr = tr.dataset.nameId
-  return changeNameMoreThenTwoPositions(idBeforeModified, idModifiedTr)
-}
+const updateAllNamesByTable = (tr) => changeNamePosition(tr.dataset.nameId, tr.sectionRowIndex)
 
 const startingDrag = (e) => {
   e.target.classList.add('dragging')
@@ -13,7 +9,7 @@ const startingDrag = (e) => {
 const endingDrag = (e) => {
   const dragging = e.target
   dragging.classList.remove('dragging')
-
+  
   return updateAllNamesByTable(dragging)
 }
 

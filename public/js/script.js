@@ -1,4 +1,4 @@
-import { getNames, setNames, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
+import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
 import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 
@@ -62,16 +62,14 @@ const addNewTableRowAfterInStorage = (addedName) => {
   const tbody = getTbodyTableNames()
   const lastTr = tbody.querySelector('tr:nth-last-child(1)')
 
-  const idx = lastTr ? +lastTr.dataset.nameId + 1 : 0
+  const idx = lastTr ? (lastTr.sectionRowIndex + 1) : 0
   const newTrHtml = getNewTableRow(addedName, idx, true)
   template.innerHTML = newTrHtml
 
   tbody.append(template.content)
   const newTr = tbody.lastElementChild
 
-  newTr.addEventListener('animationend', () => {
-    newTr.classList.remove('blink')
-  })
+  newTr.addEventListener('animationend', () => newTr.classList.remove('blink'))
 }
 
 const addNameInStorage = (e) => {
@@ -85,7 +83,7 @@ const addNameInStorage = (e) => {
   const modal = button.closest('#addName')
   const closeBtn = modal.querySelector('button.btn-close')
   
-  const addedName = setNames(values.name)
+  const addedName = setNewName(values.name)
 
   if (!addedName) {
     return
@@ -103,12 +101,7 @@ const focusInputText = (e) => {
   if (e.target !== modal || !modal.classList.contains('show')) {
     return
   }
-
-  // if (e.target === input) {
-  //   e.stopPropagation()
-  //   return
-  // }
-
+  
   setTimeout(() => input.focus(), 500)
 }
 
@@ -123,22 +116,16 @@ const removeTextNodes = ({ childNodes }) => {
 const reSortTbody = ({ children }) => {
   [...children].forEach((tr, idx) => {
     tr.dataset.nameId = idx
-
-    const allElementsWithNameId = tr.querySelectorAll('[data-name-id]')
-    allElementsWithNameId.forEach(el => el.dataset.nameId = idx)
-
+    
     tr.firstElementChild.innerText = zeroAEsquerda(idx + 1)
   })
 }
 
-const removeTr = async (tr) => {
-  const tbody = tr.closest('tbody')
+const removeTr = async (tr, names) => {
   tr.classList.add('to-remove')
-  
   tr.addEventListener('transitionend', () => {
     tr.remove()
-    removeTextNodes(tbody)
-    reSortTbody(tbody)
+    mountTableNames(names)
   })
 }
 
@@ -149,15 +136,15 @@ const removeNameInStorage = (e) => {
     const closeBtn = modal.querySelector('button.btn-close')
   
     const id = button.dataset?.nameId
-    const removed = removeName(id)
+    const names = removeName(id)
   
-    if (!removed) {
+    if (!names) {
       return
     }
     
     const tr = document.querySelector(`tr[data-name-id="${id}"`)
+    removeTr(tr, names)
     
-    removeTr(tr)
     closeBtn?.click()
   } catch (err) {
     alert(err.toString())
@@ -339,19 +326,21 @@ const insertPlusOneOption = () => {
 }
 
 const onclickTableNames = (e) => {
-  const button = e.target.closest(':is([data-remove], [data-order])')
+  const button = e.target.closest('button:is([data-remove], [data-order])')
   
   if (!button) {
     return
   }
 
+  const tr = button.closest('tr')
+
   if ('remove' in button.dataset) {
-    confirmRemoveName(button.dataset)
+    confirmRemoveName(tr.dataset)
     return
   }
 
   if ('order' in button.dataset) {
-    prepareChangeName(button.dataset)
+    prepareChangeName(tr, button.dataset.order)
     return
   }
 }
@@ -364,7 +353,7 @@ const onchangeTableNames = (e) => {
   }
   
   const isActive = inputRadio.checked
-  const id = inputRadio.dataset.nameId
+  const id = inputRadio.closest('tr').dataset.nameId
 
   toggleActiveName(id, isActive)
 }
@@ -430,7 +419,7 @@ const mountFormElements = () => {
   
   divNomes.replaceChildren(template.content)
 
-  if (divNomes.childElementCount === 0) {
+  if (!divNomes.childElementCount) {
     return
   }
 
@@ -462,9 +451,22 @@ const getTbodyTableNames = () => {
   return newTbody
 }
 
-const prepareChangeName = ({ nameId, order }) => {
+const changePositionTableRows = (tr, asc) => {
+  const otherTr = asc === true ? tr.previousElementSibling : tr.nextElementSibling
+
+  if (asc === true) {
+    otherTr.before(tr)
+    return
+  }
+
+  otherTr.after(tr)
+}
+
+const prepareChangeName = (tr, order) => {
   const asc = order === 'up'
-  const names = changeNamePosition(nameId, asc)
+  changePositionTableRows(tr, asc)
+  
+  const names = changeNameMoreThenTwoPositions(tr.dataset.nameId, tr.sectionRowIndex)
   
   if (!names) {
     return
@@ -506,24 +508,24 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
       </td>
       <td class="col col-md-3">
         <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status data-name-id="${id}" data-name="${name}">
+          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status>
           <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
         </div>
       </td>
       <td class="col col-md-2">
         <div class="row">
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove data-name-id="${id}" data-name="${name}">
+            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove>
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down" data-name-id="${id}" data-name="${name}">
+            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down">
               <i class="fa-solid fa-caret-down"></i>
             </button>
           </div>
           <div class="col px-1">
-            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up" data-name-id="${id}" data-name="${name}">
+            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up">
               <i class="fa-solid fa-caret-up"></i>
             </button>
           </div>
@@ -533,6 +535,17 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   `
 
   return newTR.trim()
+}
+
+const updateTableRow = (tr, i, { id, name, isActive }) => {
+  const checkbox = tr.querySelector('input[type=checkbox]')
+  const position = (i + 1).toString().padStart(2, '0')
+  
+  tr.dataset.nameId = id
+  checkbox.checked = isActive
+
+  tr.firstElementChild.innerText = position
+  tr.children[1].innerText = name
 }
 
 const mountTableNames = (namesArg = null, blink = false) => {
@@ -547,37 +560,22 @@ const mountTableNames = (namesArg = null, blink = false) => {
   
   for (const idx in names) {
     const i = +idx
-    const tr = tbody.children[i]?.cloneNode(true)
+    const tr = tbody.querySelector(`tr:nth-child(${(i + 1)})`)
     
     if (!tr) {
-      const name = names[i]
-      const newTR = getNewTableRow(name, i, blink)
+      const newTR = getNewTableRow(names[i], i, blink)
       template.innerHTML += newTR
       continue
     }
-    
-    if (tr?.dataset.nameId === names[i].id) {
-      template.content.append(tr)
-      continue
-    }
-    
-    const elementsToChange = tr.querySelectorAll('[data-name-id][data-name]')
 
-    elementsToChange.forEach(element => {
-      element.dataset.nameId = names[i].id
-      element.dataset.name = names[i].name
-    })
-    
-    tr.dataset.nameId = names[i].id
-    tr.dataset.name = names[i].name
+    updateTableRow(tr, i, names[i])
+  }
 
-    tr.firstElementChild.innerText = (i + 1).toString().padStart(2, '0')
-    tr.children[1].innerText = names[i].name
-
-    template.content.append(tr)
+  if (!template.content.childElementCount) {
+    return
   }
   
-  tbody.replaceChildren(template.content)
+  tbody.append(template.content)
 }
 
 const endingDragController = (e) => {
