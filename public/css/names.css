@@ -62,6 +62,20 @@ tr.blink {
   animation: blink 0.5s;
 }
 
+button[data-sort-names] {
+  > i {
+    display: none;
+  }
+
+  &[data-sort-names="up"] > i.fa-arrow-up-a-z {
+    display: unset;
+  }
+
+  &[data-sort-names="down"] > i.fa-arrow-down-a-z {
+    display: unset;
+  }
+}
+
 @keyframes blink {
   0% {
     opacity: 0;

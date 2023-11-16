@@ -111,6 +111,7 @@
 
       <div class="col-4 col-md-3 row justify-content-center">
         <button type="button" class="btn btn-info text-nowrap w-auto" data-sort-names data-content data-en="Sort" data-pt-br="Ordenar">
+          <i class="fa-solid fa-arrow-down-a-z"></i>
           <i class="fa-solid fa-arrow-up-a-z"></i>
         </button>
       </div>
@@ -118,6 +119,14 @@
       <div class="col-4 col-md-3 row justify-content-center">
         <button type="button" class="btn btn-primary text-nowrap w-auto" data-bs-toggle="modal" data-bs-target="#addName" data-content data-en="Add" data-pt-br="Adicionar">
           <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+      <div class="col-12 row justify-content-center">
+        <button type="button" class="btn btn-danger text-nowrap w-auto" data-bs-toggle="modal" data-bs-target="#removeAllNames" data-content data-en="Remove all" data-pt-br="Remover tudo">
+          <i class="far fa-trash-alt"></i>
         </button>
       </div>
     </div>
@@ -179,7 +188,7 @@
             <div class="modal-body">
               <p>
                 <span data-content data-en="Are you sure you want to" data-pt-br="Tem certeza que deseja"></span>
-                <kbd class="bg-danger" data-content data-en="remove" data-pt-br="remover"></kbd>
+                <span class="alert alert-danger py-1 px-2" data-content data-en="remove" data-pt-br="remover"></span>
                 <span data-name data-content data-en=" from list names?" data-pt-br=" da lista de nomes?"></span>
               </p>
             </div>
@@ -187,6 +196,39 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-content data-en="Cancel" data-pt-br="Cancelar"></button>
               <button type="button" class="btn btn-danger" data-remove-confirm data-content data-en="Remove" data-pt-br="Remover">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="removeAllNames" tabindex="-1" role="dialog" aria-labelledby="removeAllNamesTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <form id="remove-name">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Remove All" data-pt-br="Remover Tudo">
+                <span data-name></span>
+              </h5>
+              
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-bs-label="Close">
+                <span aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <p>
+                <span data-content data-en="Are you sure you want to" data-pt-br="Tem certeza que deseja"></span>
+                <span class="alert alert-danger py-1 px-2" data-content data-en="REMOVE ALL" data-pt-br="REMOVER TUDO"></span>
+                <span data-name data-content data-en=" from list?" data-pt-br=" da lista?"></span>
+              </p>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-content data-en="Cancel" data-pt-br="Cancelar"></button>
+              <button type="button" class="btn btn-danger" data-remove-all-confirm data-content data-en="Remove All" data-pt-br="Remover Tudo">
                 <i class="fa-solid fa-copy"></i>
               </button>
             </div>

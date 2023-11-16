@@ -1,5 +1,5 @@
 import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
-import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage } from './utils.js'
+import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage, clearLocalStorageNames } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 
 const MAX_TYPES = 5
@@ -151,6 +151,30 @@ const removeNameInStorage = (e) => {
   }
 }
 
+const removeAllNames = (e) => {
+  const button = e.currentTarget
+  const modal = button.closest('#removeAllNames')
+  const closeBtn = modal.querySelector('button.btn-close')
+
+  const tbody = document.querySelector('#table_names > tbody:last-child')
+  tbody.replaceChildren()
+
+  clearLocalStorageNames()
+
+  closeBtn.click()
+}
+
+const modifySortButtonAttribute = () => {
+  const button = document.querySelector('[data-sort-names]')
+
+  if (!button) {
+    return
+  }
+
+  const asc = getLocalStorage('sort')
+  button.dataset.sortNames = asc ? 'up' : 'down'
+}
+
 const sortNamesInTable = () => {
   const names = sortNames()
 
@@ -158,6 +182,7 @@ const sortNamesInTable = () => {
     return
   }
 
+  modifySortButtonAttribute()
   mountTableNames(names)
 }
 
@@ -466,7 +491,7 @@ const prepareChangeName = (tr, order) => {
   const asc = order === 'up'
   changePositionTableRows(tr, asc)
   
-  const names = changeNameMoreThenTwoPositions(tr.dataset.nameId, tr.sectionRowIndex)
+  const names = changeNamePosition(tr.dataset.nameId, tr.sectionRowIndex)
   
   if (!names) {
     return
@@ -668,10 +693,16 @@ const defineLangHtml = (lang = null) => {
   input.checked = true
 }
 
+const routerCheck = () => {
+  const acceptedPages = ['index', 'names'/*, 'phones'*/]
+  return acceptedPages.some(page => isPage(page))
+}
+
 const createEvents = () => {
   const events = [
     ['click',         'button[data-copiar]',                        copyText],
     ['click',         'button[data-remove-confirm]',                removeNameInStorage],
+    ['click',         'button[data-remove-all-confirm]',            removeAllNames],
     ['click',         'button[data-sort-names]',                    sortNamesInTable],
     ['click',         '#plus_one_more_option',                      insertPlusOneOption],
     ['click',         '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
@@ -696,11 +727,6 @@ const createEvents = () => {
   }
 }
 
-const routerCheck = () => {
-  const acceptedPages = ['index', 'names'/*, 'phones'*/]
-  return acceptedPages.some(page => isPage(page))
-}
-
 const init = () => {
   const pageOk = routerCheck()
 
@@ -714,6 +740,7 @@ const init = () => {
   mountFormElements()
   mountTableNames()
   mountFooter()
+  modifySortButtonAttribute()
   
   createEvents()
 }
