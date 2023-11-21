@@ -90,8 +90,7 @@ button[disabled] {
   }
 }
 
-input[type="radio"],
-input[type="radio"]+label {
+:is(input[type="radio"], input[type="radio"] + label) {
   cursor: pointer;
 }
 
