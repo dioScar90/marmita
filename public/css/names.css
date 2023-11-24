@@ -1,5 +1,5 @@
 .form-check {
-  &> :is(.form-check-input, .form-check-label) {
+  > :is(.form-check-input, .form-check-label) {
     cursor: pointer;
   }
 
@@ -32,7 +32,14 @@
 }
 
 #table_names > tbody:not(.for-empty-table)  {
-  & > tr:first-of-type > td:last-of-type div.col:has(button[data-order="up"]) {
+  counter-reset: names;
+
+  > tr > th::after {
+    counter-increment: names;
+    content: counter(names);
+  }
+
+  > tr:first-of-type > td:last-of-type div.col:has(button[data-order="up"]) {
     cursor: not-allowed;
 
     & button[data-order="up"] {
@@ -41,7 +48,7 @@
     }
   }
 
-  & > tr:last-of-type > td:last-of-type div.col:has(button[data-order="down"]) {
+  > tr:last-of-type > td:last-of-type div.col:has(button[data-order="down"]) {
     cursor: not-allowed;
 
     & button[data-order="down"] {

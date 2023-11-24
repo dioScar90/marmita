@@ -516,8 +516,6 @@ const confirmRemoveName = ({ nameId, name }) => {
 }
 
 const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
-  const position = zeroAEsquerda(idx + 1)
-
   const checked = isActive ? 'checked' : ''
   const radioId = `status_${idx}`
 
@@ -525,9 +523,7 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   
   const newTR = `
     <tr ${blinkClass} data-name-id="${id}" data-name="${name}" draggable="true">
-      <th scope="row">
-        ${position}
-      </th>
+      <th scope="row"></th>
       <td>
         ${name}
       </td>
@@ -564,12 +560,10 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
 
 const updateTableRow = (tr, i, { id, name, isActive }) => {
   const checkbox = tr.querySelector('input[type=checkbox]')
-  const position = (i + 1).toString().padStart(2, '0')
   
   tr.dataset.nameId = id
   checkbox.checked = isActive
 
-  tr.firstElementChild.innerText = position
   tr.children[1].innerText = name
 }
 
