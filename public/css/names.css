@@ -36,7 +36,7 @@
 
   > tr > th::after {
     counter-increment: names;
-    content: counter(names);
+    content: counter(names, decimal-leading-zero);
   }
 
   > tr:first-of-type > td:last-of-type div.col:has(button[data-order="up"]) {
