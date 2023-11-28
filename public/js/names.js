@@ -1,13 +1,13 @@
-import { getLocalStorage, setLocalStorage } from './utils.js'
+import { getStorage, setStorage } from './utils.js'
 
 const Names = (() => {
-  const getNames = () => 'names' in localStorage ? getLocalStorage('names') : []
+  const getNames = () => 'names' in localStorage ? getStorage('names') : []
 
   const _getAscValue = () => {
-    const actualAsc = 'sort' in localStorage ? getLocalStorage('sort') : false
+    const actualAsc = 'sort' in localStorage ? getStorage('sort') : false
 
     const asc = !actualAsc
-    setLocalStorage('sort', asc)
+    setStorage('sort', asc)
 
     return asc
   }
@@ -19,7 +19,7 @@ const Names = (() => {
     const names = getNames()
 
     const sortedNames = names.toSorted((n1, n2) => _compareName(n1, n2, asc))
-    setLocalStorage('names', sortedNames)
+    setStorage('names', sortedNames)
 
     return sortedNames
   }
@@ -95,7 +95,7 @@ const Names = (() => {
     return [actualNames, idx]
   }
 
-  const _updateNames = names => setLocalStorage('names', names)
+  const _updateNames = names => setStorage('names', names)
 
   return { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition }
 })()

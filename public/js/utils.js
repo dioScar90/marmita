@@ -17,11 +17,9 @@ const listenerCreator = (() => {
   return { create }
 })()
 
-const getLocalStorage = (key) => JSON.parse(localStorage.getItem(key))
-const setLocalStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value))
-const clearLocalStorageNames = () => localStorage.removeItem('names')
-
-const replaceAllNames = (names) => localStorage.setItem('names', JSON.stringify(names))
+const getStorage = (key) => JSON.parse(localStorage.getItem(key))
+const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value))
+const clearNames = () => localStorage.removeItem('names')
 
 const getFormValues = (form, getAllTypes = false) => {
   const formData = new FormData(form)
@@ -31,20 +29,11 @@ const getFormValues = (form, getAllTypes = false) => {
     if (getAllTypes && typeof value !== 'string') {
       continue
     }
+
     values[name] = value.trim()
   }
 
   return values
 }
 
-const zeroAEsquerda = (str, maxLength = 2) => str.toString().padStart(maxLength, '0')
-
-const getHoraFormatada = (data) => {
-  const segundos = (data) => zeroAEsquerda(data.getSeconds())
-  const minutos = (data) => zeroAEsquerda(data.getMinutes())
-  const horas = (data) => zeroAEsquerda(data.getHours())
-
-  return horas(data) + 'h' + minutos(data) + 'm' + segundos(data)
-}
-
-export { zeroAEsquerda, getHoraFormatada, listenerCreator, getLocalStorage, setLocalStorage, clearLocalStorageNames, replaceAllNames, getFormValues }
+export { listenerCreator, getStorage, setStorage, clearNames, getFormValues }
