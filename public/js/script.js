@@ -1,5 +1,5 @@
 import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
-import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage, clearLocalStorageNames } from './utils.js'
+import { listenerCreator, getFormValues, getStorage, setStorage, clearNames } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 // import CustomEncryption from './encryption.js'
 
@@ -18,17 +18,6 @@ const isPage = (page) => {
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
 
-const getValuesDoForm = form => {
-  const formData = new FormData(form)
-  const values = {}
-
-  for (const [key, value] of formData) {
-    values[key] = value.trim()
-  }
-
-  return values
-}
-
 const generateRandomHexColor = () => {
   // Generate a random hex color code (e.g., #RRGGBB)
   const randomColor = '#' + Math.floor(Math.random() * 16_777_215).toString(16)
@@ -43,9 +32,7 @@ const getTextoFinal = (pedidos, total) => {
     pedidosJoin +
     '\n' +
     '\n' +
-    'Total de marmitas: ' +
-    total +
-    '.'  +
+    'Total de marmitas: ' + total + '.'  +
     '\n' +
     '\n' +
     'Horário: *11h30*.' +
@@ -106,22 +93,6 @@ const focusInputText = (e) => {
   setTimeout(() => input.focus(), 500)
 }
 
-const removeTextNodes = ({ childNodes }) => {
-  [...childNodes].forEach(node => {
-    if (!(node instanceof HTMLElement)) {
-      node.remove()
-    }
-  })
-}
-
-const reSortTbody = ({ children }) => {
-  [...children].forEach((tr, idx) => {
-    tr.dataset.nameId = idx
-    
-    tr.firstElementChild.innerText = zeroAEsquerda(idx + 1)
-  })
-}
-
 const removeTr = async (tr, names) => {
   tr.classList.add('to-remove')
   tr.addEventListener('transitionend', () => {
@@ -160,7 +131,7 @@ const removeAllNames = (e) => {
   const tbody = document.querySelector('#table_names > tbody:last-child')
   tbody.replaceChildren()
 
-  clearLocalStorageNames()
+  clearNames()
 
   closeBtn.click()
 }
@@ -172,7 +143,7 @@ const modifySortButtonAttribute = () => {
     return
   }
 
-  const asc = getLocalStorage('sort')
+  const asc = getStorage('sort')
   button.dataset.sortNames = asc ? 'up' : 'down'
 }
 
@@ -236,11 +207,6 @@ const insertAlertMessage = () => {
   divBotoesForm.insertAdjacentHTML('beforebegin', alertMessage)
 }
 
-const formReset = e => {
-  const alert = document.querySelector('#tudo-bem')
-  alert?.toggleAttribute('hidden', true)
-}
-
 const getHeadSalada = () => `Marmita c/ 2 ovos, 2 bifes e 4 saquinhos de salada *(sem pepino)*`
 const getHeadOpcao = opcao => `Opção *${opcao}*, tamanho *P*`
 
@@ -259,10 +225,10 @@ const sendTextToWhatsAppWeb = () => {
 
 const gerarPedidosObj = (values) => {
   const obj = {}
-
+  
   for (const key in values) {
     const value = values[key]
-
+    
     obj[value] ??= []
     obj[value].push(key)
   }
@@ -289,8 +255,8 @@ const getPedidosParaTextoFinal = (pedidosObj) => {
 const formSubmit = e => {
   e.preventDefault()
 
-  const form = e.currentTarget
-  const values = getValuesDoForm(form)
+  const form = e.target
+  const values = getFormValues(form)
 
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
@@ -559,7 +525,7 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   return newTR.trim()
 }
 
-const updateTableRow = (tr, i, { id, name, isActive }) => {
+const updateTableRow = (tr, { id, name, isActive }) => {
   const checkbox = tr.querySelector('input[type=checkbox]')
   
   tr.dataset.nameId = id
@@ -588,7 +554,7 @@ const mountTableNames = (namesArg = null, blink = false) => {
       continue
     }
 
-    updateTableRow(tr, i, names[i])
+    updateTableRow(tr, names[i])
   }
 
   if (!template.content.childElementCount) {
@@ -666,16 +632,16 @@ const mountCssColor = () => {
 
 const getLang = (defaultLang) => {
   if (!('lang' in localStorage)) {
-    setLocalStorage('lang', defaultLang)
+    setStorage('lang', defaultLang)
   }
 
-  return getLocalStorage('lang')
+  return getStorage('lang')
 }
 
 const changeLang = (e) => {
   const inputSwitch = e.target
   
-  setLocalStorage('lang', inputSwitch.value)
+  setStorage('lang', inputSwitch.value)
   defineLangHtml(inputSwitch.value)
 }
 
@@ -704,9 +670,7 @@ const createEvents = () => {
 
     ['change',        '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
     ['change',        '#switch_lang',                               changeLang],
-
-    ['reset',         '#form-marmitas',                             formReset],
-
+    
     ['submit',        '#form-marmitas',                             formSubmit],
     ['submit',        '#adicionar-nome',                            addNameInStorage],
 
