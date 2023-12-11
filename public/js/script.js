@@ -1,6 +1,7 @@
 import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
 import { zeroAEsquerda, listenerCreator, getFormValues, getLocalStorage, setLocalStorage, clearLocalStorageNames } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
+// import CustomEncryption from './encryption.js'
 
 const MAX_TYPES = 5
 
@@ -728,6 +729,8 @@ const init = () => {
     location = 'index.html'
     return
   }
+
+  // CustomEncryption.checkEncryptionKey()
 
   defineLangHtml()
   mountCssColor()
