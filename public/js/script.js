@@ -1,11 +1,19 @@
-import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
+import {
+  getNames,
+  setNewName,
+  toggleActiveName,
+  removeName,
+  sortNames,
+  changeNamePosition,
+} from './names.js'
 import { listenerCreator, getFormValues, getStorage, setStorage, clearNames } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
-// import CustomEncryption from './encryption.js'
+import { getPhones, setPhone } from './phones.js'
+import Encryption from './encryption.js'
 
 const MAX_TYPES = 5
 
-const isPage = (page) => {
+const isPage = page => {
   const thisPage = location.pathname.split('/').at(-1)
 
   if (page === 'index' && thisPage === '') {
@@ -17,6 +25,7 @@ const isPage = (page) => {
 
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
+const isPhonesPage = () => isPage('phones')
 
 const generateRandomHexColor = () => {
   // Generate a random hex color code (e.g., #RRGGBB)
@@ -32,7 +41,9 @@ const getTextoFinal = (pedidos, total) => {
     pedidosJoin +
     '\n' +
     '\n' +
-    'Total de marmitas: ' + total + '.'  +
+    'Total de marmitas: ' +
+    total +
+    '.' +
     '\n' +
     '\n' +
     'Horário: *11h30*.' +
@@ -45,13 +56,13 @@ const getTextoFinal = (pedidos, total) => {
   return textoFinal
 }
 
-const addNewTableRowAfterInStorage = (addedName) => {
+const addNewTableRowAfterInStorage = addedName => {
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
   const lastTr = tbody.querySelector('tr:nth-last-child(1)')
 
-  const idx = lastTr ? (lastTr.sectionRowIndex + 1) : 0
-  const newTrHtml = getNewTableRow(addedName, idx, true)
+  const idx = lastTr ? lastTr.sectionRowIndex + 1 : 0
+  const newTrHtml = getNewNamesTableRow(addedName, idx, true)
   template.innerHTML = newTrHtml
 
   tbody.append(template.content)
@@ -60,17 +71,17 @@ const addNewTableRowAfterInStorage = (addedName) => {
   newTr.addEventListener('animationend', () => newTr.classList.remove('blink'))
 }
 
-const addNameInStorage = (e) => {
+const addNameInStorage = e => {
   e.preventDefault()
 
   const form = e.target
   const button = e.submitter
 
   const values = getFormValues(form)
-  
+
   const modal = button.closest('#addName')
   const closeBtn = modal.querySelector('button.btn-close')
-  
+
   const addedName = setNewName(values.name)
 
   if (!addedName) {
@@ -82,14 +93,14 @@ const addNameInStorage = (e) => {
   form.reset()
 }
 
-const focusInputText = (e) => {
+const focusInputText = e => {
   const modal = e.currentTarget
   const input = modal.querySelector('input[name="name"]')
-  
+
   if (e.target !== modal || !modal.classList.contains('show')) {
     return
   }
-  
+
   setTimeout(() => input.focus(), 500)
 }
 
@@ -101,29 +112,29 @@ const removeTr = async (tr, names) => {
   })
 }
 
-const removeNameInStorage = (e) => {
+const removeNameInStorage = e => {
   try {
     const button = e.currentTarget
     const modal = button.closest('#removeName')
     const closeBtn = modal.querySelector('button.btn-close')
-  
+
     const id = button.dataset?.nameId
     const names = removeName(id)
-  
+
     if (!names) {
       return
     }
-    
+
     const tr = document.querySelector(`tr[data-name-id="${id}"`)
     removeTr(tr, names)
-    
+
     closeBtn?.click()
   } catch (err) {
     alert(err.toString())
   }
 }
 
-const removeAllNames = (e) => {
+const removeAllNames = e => {
   const button = e.currentTarget
   const modal = button.closest('#removeAllNames')
   const closeBtn = modal.querySelector('button.btn-close')
@@ -158,7 +169,7 @@ const sortNamesInTable = () => {
   mountTableNames(names)
 }
 
-const copyText = async (e) => {
+const copyText = async e => {
   const formMarmitas = document.querySelector('#form-marmitas')
   const modal = e.currentTarget.closest('#pedidosModal')
   const closeBtn = modal.querySelector('button.btn-close')
@@ -170,7 +181,7 @@ const copyText = async (e) => {
   if ('clipboard' in navigator) {
     await navigator.clipboard.writeText(textarea.value)
     const alert = document.querySelector('#tudo-bem')
-    setTimeout(() => alert.hidden = false, 50)
+    setTimeout(() => (alert.hidden = false), 50)
   } else {
     setTimeout(() => alert('Não foi possível copiar. :( Por favor tente copiar na unha mesmo.'), 50)
   }
@@ -193,7 +204,7 @@ const insertAlertMessage = () => {
   if (alert) {
     return
   }
-  
+
   const alertMessage = `
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="tudo-bem" hidden>
       <strong>Tudo bem, tudo bangos!</strong> Texto copiado com sucesso. <i class="fa-regular fa-face-smile-wink"></i>
@@ -223,12 +234,12 @@ const sendTextToWhatsAppWeb = () => {
   location = 'https://wa.me/5518996202605/?text=' + parsed
 }
 
-const gerarPedidosObj = (values) => {
+const gerarPedidosObj = values => {
   const obj = {}
-  
+
   for (const key in values) {
     const value = values[key]
-    
+
     obj[value] ??= []
     obj[value].push(key)
   }
@@ -236,7 +247,7 @@ const gerarPedidosObj = (values) => {
   return obj
 }
 
-const getPedidosParaTextoFinal = (pedidosObj) => {
+const getPedidosParaTextoFinal = pedidosObj => {
   const pedidos = []
 
   for (const key in pedidosObj) {
@@ -260,7 +271,7 @@ const formSubmit = e => {
 
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
-  
+
   if (pedidos.length === 0) {
     sessionStorage.removeItem('textoFinal')
     alert('Tem que escolher pelo menos 1 né fião...')
@@ -293,7 +304,7 @@ const formSubmit = e => {
 
   formClose.append(textarea, button)
   openPedidosModal(textarea, pre)
-  
+
   sessionStorage.setItem('textoFinal', textoFinal)
   insertAlertMessage()
 }
@@ -301,7 +312,7 @@ const formSubmit = e => {
 const insertPlusOneOption = () => {
   const selector = `[data-nomes] > dl > dd:not(:has(:nth-child(${MAX_TYPES}))) > div:nth-last-child(2)`
   const ultimasDivsValuesNumericos = document.querySelectorAll(selector)
-  
+
   if (ultimasDivsValuesNumericos.length === 0) {
     alert('Máximo de opção já atingidas')
     return
@@ -317,9 +328,9 @@ const insertPlusOneOption = () => {
   })
 }
 
-const onclickTableNames = (e) => {
+const onclickTableNames = e => {
   const button = e.target.closest('button:is([data-remove], [data-order])')
-  
+
   if (!button) {
     return
   }
@@ -337,13 +348,13 @@ const onclickTableNames = (e) => {
   }
 }
 
-const onchangeTableNames = (e) => {
+const onchangeTableNames = e => {
   const inputRadio = e.target.closest(':scope[data-status][type=checkbox]')
-  
+
   if (!inputRadio) {
     return
   }
-  
+
   const isActive = inputRadio.checked
   const id = inputRadio.closest('tr').dataset.nameId
 
@@ -364,9 +375,9 @@ const getNewDivOption = (value, nome) => {
   `
 }
 
-const getOptionSalad = (nome) => getNewDivOption('salada', nome)
+const getOptionSalad = nome => getNewDivOption('salada', nome)
 
-const getNewFormElement = (nome) => {
+const getNewFormElement = nome => {
   const option1 = getNewDivOption(1, nome)
   const option2 = getNewDivOption(2, nome)
   const salada = getOptionSalad(nome)
@@ -390,25 +401,25 @@ const mountFormElements = () => {
   if (!isIndexPage()) {
     return
   }
-  
+
   const names = getNames()
 
   if (names.length === 0) {
     return
   }
-  
+
   const template = document.createElement('template')
   const divNomes = document.querySelector('#form-marmitas [data-nomes]')
-  
+
   for (const { name, isActive } of names) {
     if (!isActive) {
       continue
     }
-    
+
     const newElement = getNewFormElement(name)
     template.innerHTML += newElement
   }
-  
+
   divNomes.replaceChildren(template.content)
 
   if (!divNomes.childElementCount) {
@@ -416,18 +427,35 @@ const mountFormElements = () => {
   }
 
   const allBtnDisabled = document.querySelectorAll('button[disabled]')
-  allBtnDisabled.forEach(btn => btn.disabled = false)
+  allBtnDisabled.forEach(btn => (btn.disabled = false))
 }
 
 const mountFooter = () => {
   const spanCurrentYear = document.querySelector('#current_year')
   const currentYear = new Date().getFullYear()
-  
+
   spanCurrentYear.innerText = currentYear
 }
 
 const getTbodyTableNames = () => {
   const table = document.querySelector('#table_names')
+  const tbody = table.querySelector('tbody:not(.for-empty-table)')
+
+  if (tbody) {
+    return tbody
+  }
+
+  const newTbody = document.createElement('tbody')
+  table.append(newTbody)
+
+  listenerCreator.create('click', newTbody, onclickTableNames)
+  listenerCreator.create('change', newTbody, onchangeTableNames)
+
+  return newTbody
+}
+
+const getTbodyTablePhones = () => {
+  const table = document.querySelector('#table_phones')
   const tbody = table.querySelector('tbody:not(.for-empty-table)')
 
   if (tbody) {
@@ -457,9 +485,9 @@ const changePositionTableRows = (tr, asc) => {
 const prepareChangeName = (tr, order) => {
   const asc = order === 'up'
   changePositionTableRows(tr, asc)
-  
+
   const names = changeNamePosition(tr.dataset.nameId, tr.sectionRowIndex)
-  
+
   if (!names) {
     return
   }
@@ -472,8 +500,10 @@ const confirmRemoveName = ({ nameId, name }) => {
 
   const titleSpan = document.querySelector('#removeName .modal-title span[data-name]')
   const paragSpan = document.querySelector('#removeName .modal-body span[data-name]')
-  const buttonConfirm = document.querySelector('#removeName .modal-footer button[data-remove-confirm]')
-  
+  const buttonConfirm = document.querySelector(
+    '#removeName .modal-footer button[data-remove-confirm]'
+  )
+
   titleSpan.innerText = name
   paragSpan.innerText = name
   buttonConfirm.dataset.name = name
@@ -482,12 +512,12 @@ const confirmRemoveName = ({ nameId, name }) => {
   buttonOpen.click()
 }
 
-const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
+const getNewNamesTableRow = ({ id, name, isActive }, idx, blink = false) => {
   const checked = isActive ? 'checked' : ''
   const radioId = `status_${idx}`
 
   const blinkClass = blink ? 'class="blink"' : ''
-  
+
   const newTR = `
     <tr ${blinkClass} data-name-id="${id}" data-name="${name}" draggable="true">
       <th scope="row"></th>
@@ -525,9 +555,9 @@ const getNewTableRow = ({ id, name, isActive }, idx, blink = false) => {
   return newTR.trim()
 }
 
-const updateTableRow = (tr, { id, name, isActive }) => {
+const updateNamesTableRow = (tr, { id, name, isActive }) => {
   const checkbox = tr.querySelector('input[type=checkbox]')
-  
+
   tr.dataset.nameId = id
   checkbox.checked = isActive
 
@@ -538,35 +568,136 @@ const mountTableNames = (namesArg = null, blink = false) => {
   if (!isNamesPage()) {
     return
   }
-  
+
   const names = namesArg ?? getNames()
-  
+
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
-  
+
   for (const idx in names) {
     const i = +idx
-    const tr = tbody.querySelector(`tr:nth-child(${(i + 1)})`)
-    
+    const tr = tbody.querySelector(`tr:nth-child(${i + 1})`)
+
     if (!tr) {
-      const newTR = getNewTableRow(names[i], i, blink)
+      const newTR = getNewNamesTableRow(names[i], i, blink)
       template.innerHTML += newTR
       continue
     }
 
-    updateTableRow(tr, names[i])
+    updateNamesTableRow(tr, names[i])
   }
 
   if (!template.content.childElementCount) {
     return
   }
-  
+
   tbody.append(template.content)
 }
 
-const endingDragController = (e) => {
+const formatPhoneNumber = phone => {
+  // Validate if the input is a string
+  if (typeof phone !== 'string') {
+    throw new Error('Input must be a string')
+  }
+
+  // Remove non-numeric characters from the input
+  const cleanedNumber = phone.replace(/\D/g, '')
+
+  // Check if the cleaned number has at least 7 digits
+  if (cleanedNumber.length < 11) {
+    throw new Error('Phone number must have at least 11 digits')
+  }
+
+  // Extract the three parts
+  const ddd = cleanedNumber.slice(0, 2)
+  const secondPart = cleanedNumber.slice(2, -4)
+  const thirdPart = cleanedNumber.slice(-4)
+
+  const formattedPhoneNumber = `(${ddd}) ${secondPart}-${thirdPart}`
+  return formattedPhoneNumber
+}
+
+const getNewPhonesTableRow = (phone, blink = false) => {
+  const blinkClass = blink ? 'class="blink"' : ''
+
+  const newTR = `
+    <tr ${blinkClass} draggable="true">
+      <th scope="row"></th>
+      <td>
+        ${formatPhoneNumber(phone)}
+      </td>
+      <td class="col col-md-2">
+        <div class="row">
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove>
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down">
+              <i class="fa-solid fa-caret-down"></i>
+            </button>
+          </div>
+          <div class="col px-1">
+            <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up">
+              <i class="fa-solid fa-caret-up"></i>
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `
+
+  return newTR.trim()
+}
+
+const updatePhonesTableRow = (tr, { id, name, isActive }) => {
+  const checkbox = tr.querySelector('input[type=checkbox]')
+
+  tr.dataset.nameId = id
+  checkbox.checked = isActive
+
+  tr.children[1].innerText = name
+}
+
+const mountTablePhones = (phonesArg = null) => {
+  if (!isPhonesPage()) {
+    return
+  }
+
+  const phones = phonesArg ?? getPhones()
+
+  const template = document.createElement('template')
+  const tbody = getTbodyTablePhones()
+
+  for (const p of phones) {
+    const newTR = getNewPhonesTableRow(p)
+    template.innerHTML += newTR
+  }
+
+  // for (const idx in phones) {
+  //   const i = +idx
+  //   const tr = tbody.querySelector(`tr:nth-child(${i + 1})`)
+
+  //   if (!tr) {
+  //     const newTR = getNewPhonesTableRow(phones[i], i, blink)
+  //     template.innerHTML += newTR
+  //     continue
+  //   }
+
+  //   updatePhonesTableRow(tr, phones[i])
+  // }
+
+  if (!template.content.childElementCount) {
+    return
+  }
+
+  tbody.append(template.content)
+}
+
+const endingDragController = e => {
   const names = endingDrag(e)
-  
+
   if (!names) {
     return
   }
@@ -574,17 +705,17 @@ const endingDragController = (e) => {
   mountTableNames(names)
 }
 
-const getByChecks = (limit) => {
+const getByChecks = limit => {
   const last = limit - 1
   const stylesheets = []
-  
+
   for (let i = 0; i < limit; i++) {
     const value = i === last ? 'salada' : (i + 1).toString()
     const color = generateRandomHexColor()
     const sheet = `&:has(input[value="${value}"]:checked) { --color-checked-mark: ${color} }`
     stylesheets.push(sheet)
   }
-  
+
   return stylesheets.join('\n')
 }
 
@@ -592,7 +723,7 @@ const getStylesheetColors = () => {
   const radioBeforeContent = `\\2713`
   const whiteSpace = `\\0000a0`
   const stylesheets = getByChecks(MAX_TYPES)
-  
+
   return `
     [data-nomes] > dl {
       &:not(:last-of-type) {
@@ -623,14 +754,14 @@ const mountCssColor = () => {
   if (!isIndexPage()) {
     return
   }
-  
+
   const style = document.createElement('style')
   style.innerHTML = getStylesheetColors()
-  
+
   document.head.append(style)
 }
 
-const getLang = (defaultLang) => {
+const getLang = defaultLang => {
   if (!('lang' in localStorage)) {
     setStorage('lang', defaultLang)
   }
@@ -638,9 +769,9 @@ const getLang = (defaultLang) => {
   return getStorage('lang')
 }
 
-const changeLang = (e) => {
+const changeLang = e => {
   const inputSwitch = e.target
-  
+
   setStorage('lang', inputSwitch.value)
   defineLangHtml(inputSwitch.value)
 }
@@ -649,39 +780,43 @@ const defineLangHtml = (lang = null) => {
   const html = document.querySelector('html')
   const langValue = lang ?? getLang(html.lang)
   const input = document.querySelector(`#switch_lang input[value="${langValue}"]`)
-  
+
   html.lang = langValue
   input.checked = true
 }
 
 const routerCheck = () => {
-  const acceptedPages = ['index', 'names'/*, 'phones'*/]
+  const acceptedPages = [
+    'index',
+    'names',
+    // 'phones',
+  ]
   return acceptedPages.some(page => isPage(page))
 }
 
 const createEvents = () => {
   const events = [
-    ['click',         'button[data-copiar]',                        copyText],
-    ['click',         'button[data-remove-confirm]',                removeNameInStorage],
-    ['click',         'button[data-remove-all-confirm]',            removeAllNames],
-    ['click',         'button[data-sort-names]',                    sortNamesInTable],
-    ['click',         '#plus_one_more_option',                      insertPlusOneOption],
-    ['click',         '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+    ['click', 'button[data-copiar]', copyText],
+    ['click', 'button[data-remove-confirm]', removeNameInStorage],
+    ['click', 'button[data-remove-all-confirm]', removeAllNames],
+    ['click', 'button[data-sort-names]', sortNamesInTable],
+    ['click', '#plus_one_more_option', insertPlusOneOption],
+    ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
 
-    ['change',        '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
-    ['change',        '#switch_lang',                               changeLang],
-    
-    ['submit',        '#form-marmitas',                             formSubmit],
-    ['submit',        '#adicionar-nome',                            addNameInStorage],
+    ['change', '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    ['change', '#switch_lang', changeLang],
 
-    ['dragstart',     '#table_names > tbody:not(.for-empty-table)', startingDrag],
-    ['dragend',       '#table_names > tbody:not(.for-empty-table)', endingDragController],
-    ['dragover',      '#table_names > tbody:not(.for-empty-table)', movingDragElement],
-    
-    ['transitionend', '#addName',                                   focusInputText],
+    ['submit', '#form-marmitas', formSubmit],
+    ['submit', '#adicionar-nome', addNameInStorage],
+
+    ['dragstart', '#table_names > tbody:not(.for-empty-table)', startingDrag],
+    ['dragend', '#table_names > tbody:not(.for-empty-table)', endingDragController],
+    ['dragover', '#table_names > tbody:not(.for-empty-table)', movingDragElement],
+
+    ['transitionend', '#addName', focusInputText],
   ]
 
-  for (const [ eventType, selector, func, options = {} ] of events) {
+  for (const [eventType, selector, func, options = {}] of events) {
     listenerCreator.create(eventType, selector, func, options)
   }
 }
@@ -694,15 +829,16 @@ const init = () => {
     return
   }
 
-  // CustomEncryption.checkEncryptionKey()
-
+  Encryption.checkEncryptionKey()
+  
   defineLangHtml()
   mountCssColor()
   mountFormElements()
   mountTableNames()
+  mountTablePhones()
   mountFooter()
   modifySortButtonAttribute()
-  
+
   createEvents()
 }
 

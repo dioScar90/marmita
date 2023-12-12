@@ -19,6 +19,8 @@ const listenerCreator = (() => {
 
 const getStorage = (key) => JSON.parse(localStorage.getItem(key))
 const setStorage = (key, value) => localStorage.setItem(key, JSON.stringify(value))
+
+const clearPhones = () => localStorage.removeItem('phones')
 const clearNames = () => localStorage.removeItem('names')
 
 const getFormValues = (form, getAllTypes = false) => {
@@ -36,4 +38,4 @@ const getFormValues = (form, getAllTypes = false) => {
   return values
 }
 
-export { listenerCreator, getStorage, setStorage, clearNames, getFormValues }
+export { listenerCreator, getStorage, setStorage, clearNames, clearPhones, getFormValues }
