@@ -76,7 +76,7 @@
   <main class="container">
     <header class="row">
       <div class="col-12 col-md-6">
-        <h1 class="text-center" data-content data-en="Add / remove names" data-pt-br="Adicionar / remover nomes"></h1>
+        <h1 class="text-center" data-content data-en="Add / remove phones" data-pt-br="Adicionar / remover telefones"></h1>
       </div>
     </header>
 
@@ -85,7 +85,7 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col" data-content data-en="Phone" data-pt-br="Telefone"></th>
-          <!-- <th scope="col" data-content data-en="Status" data-pt-br="Status"></th> -->
+          <th scope="col" data-content data-en="Status" data-pt-br="Status"></th>
           <th scope="col" data-content data-en="Actions" data-pt-br="Ações"></th>
         </tr>
       </thead>
@@ -126,6 +126,14 @@
         <button type="button" class="btn btn-primary text-nowrap w-auto" data-bs-toggle="modal"
           data-bs-target="#addPhone" data-content data-en="Add" data-pt-br="Adicionar">
           <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+      <div class="col-12 row justify-content-center">
+        <button type="button" class="btn btn-danger text-nowrap w-auto" data-bs-toggle="modal" data-bs-target="#removeAllPhones" data-content data-en="Remove all" data-pt-br="Remover tudo">
+          <i class="far fa-trash-alt"></i>
         </button>
       </div>
     </div>
@@ -176,16 +184,16 @@
       </div>
     </div>
 
-    <button type="button" data-bs-toggle="modal" data-bs-target="#removeName" hidden></button>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#removePhone" hidden></button>
 
-    <div class="modal fade" id="removeName" tabindex="-1" role="dialog" aria-labelledby="removeNameTitle"
+    <div class="modal fade" id="removePhone" tabindex="-1" role="dialog" aria-labelledby="removePhoneTitle"
       aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
           <form id="remove-name">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Remove" data-pt-br="Remover">
-                <span data-name></span>
+                <span data-phone></span>
               </h5>
 
 
@@ -201,7 +209,7 @@
               <p>
                 <span data-content data-en="Are you sure you want to" data-pt-br="Tem certeza que deseja"></span>
                 <span class="alert alert-danger py-1 px-2" data-content data-en="remove" data-pt-br="remover"></span>
-                <span data-name data-content data-en="from list names?" data-pt-br="da lista de nomes?"></span>
+                <span data-phone data-content data-en="from list phones?" data-pt-br="da lista de telefones?"></span>
               </p>
             </div>
 
@@ -210,6 +218,39 @@
                 data-pt-br="Cancelar"></button>
               <button type="button" class="btn btn-danger" data-remove-confirm data-content data-en="Remove"
                 data-pt-br="Remover">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="removeAllPhones" tabindex="-1" role="dialog" aria-labelledby="removeAllPhonesTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <form id="remove-phone">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Remove All" data-pt-br="Remover Tudo">
+                <span data-phone></span>
+              </h5>
+              
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-bs-label="Close">
+                <span aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <p>
+                <span data-content data-en="Are you sure you want to" data-pt-br="Tem certeza que deseja"></span>
+                <span class="alert alert-danger py-1 px-2" data-content data-en="REMOVE ALL" data-pt-br="REMOVER TUDO"></span>
+                <span data-phone data-content data-en=" from list?" data-pt-br=" da lista?"></span>
+              </p>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-content data-en="Cancel" data-pt-br="Cancelar"></button>
+              <button type="button" class="btn btn-danger" data-remove-all-confirm data-content data-en="Remove All" data-pt-br="Remover Tudo">
                 <i class="fa-solid fa-copy"></i>
               </button>
             </div>

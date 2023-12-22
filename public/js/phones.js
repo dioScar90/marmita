@@ -2,14 +2,36 @@ import Encryption from './encryption.js'
 import { clearPhones, getStorage, setStorage } from './utils.js'
 
 const Phones = (() => {
+  const getPhoneById = (idToFind) => _findName(idToFind)
+
+  const _getEncryptedPhones = () => 'phones' in localStorage ? getStorage('phones') : []
+
   const getPhones = () => {
-    const encryptedPhones = 'phones' in localStorage ? getStorage('phones') : []
-    const phones = encryptedPhones.map(p => Encryption.decrypt(p))
+    const encryptedPhones = _getEncryptedPhones()
+    const phones = encryptedPhones.map((p) => ({ ...p, phone: Encryption.decrypt(p.phone) }))
     return phones
   }
-
+  
   const setNewPhone = (newPhone) => {
+    try {
+      const phones = _getEncryptedPhones()
+      
+      const isActive = true
+      const id = self.crypto.randomUUID()
+      const phone = Encryption.encrypt(newPhone)
+      const phoneToAppend = { id, phone, isActive }
+      
+      phones.push(phoneToAppend)
+      _updatePhones(phones)
+      
+      return getPhoneById(id)
+    } catch (err) {
+      return false
+    }
+
     const phones = getPhones()
+
+    console.log(newPhone)
 
     if (phones.includes(newPhone)) {
       return false
@@ -17,6 +39,8 @@ const Phones = (() => {
     
     phones.push(newPhone)
     const encryptedPhones = phones.map(p => Encryption.encrypt(p))
+
+    console.log(encryptedPhones)
 
     setStorage('phones', encryptedPhones)
     return newPhone
@@ -39,103 +63,18 @@ const Phones = (() => {
 
   const removeAllPhones = () => clearPhones()
 
-  // const getNames = () => 'names' in localStorage ? getStorage('names') : []
+  const _findName = idToFind => {
+    const phones = getPhones()
+    const phone = phones.find(({ id }) => id === idToFind)
+    return phone
+    // const actualNames = getNames() ?? []
+    // const idx = actualNames.findIndex(({ id }) => id === idToFind)
+    // return [actualNames, idx]
+  }
 
-  // const _getAscValue = () => {
-  //   const actualAsc = 'sort' in localStorage ? getStorage('sort') : false
-
-  //   const asc = !actualAsc
-  //   setStorage('sort', asc)
-
-  //   return asc
-  // }
-
-  // const _compareName = (n1, n2, asc) => asc ? n1.name.localeCompare(n2.name) : n2.name.localeCompare(n1.name)
+  const _updatePhones = phones => setStorage('phones', phones)
   
-  // const sortNames = () => {
-  //   const asc = _getAscValue()
-  //   const names = getNames()
-
-  //   const sortedNames = names.toSorted((n1, n2) => _compareName(n1, n2, asc))
-  //   setStorage('names', sortedNames)
-
-  //   return sortedNames
-  // }
-  
-  // const _filaDumaEgua = (id, oldIdx, newIdx, actualNames) => {
-  //   const item = {...actualNames[oldIdx]}
-
-  //   const tempNames = actualNames.toSpliced(oldIdx, 1)
-  //   const newNames = tempNames.toSpliced(newIdx, 0, item)
-    
-  //   return newNames
-  // }
-
-  // const changeNamePosition = (id, newIdx) => {
-  //   const [actualNames, oldIdx] = _findName(id)
-    
-  //   if (oldIdx === -1 || newIdx === oldIdx) {
-  //     return false
-  //   }
-    
-  //   const newNames = _filaDumaEgua(id, oldIdx, newIdx, actualNames)
-  //   _updateNames(newNames)
-    
-  //   return newNames
-  // }
-
-  // const setNewName = (name) => {
-  //   try {
-  //     const actualNames = getNames() ?? []
-      
-  //     const isActive = true
-  //     const id = self.crypto.randomUUID()
-  //     const nameToAppend = { id, name, isActive }
-      
-  //     actualNames.push(nameToAppend)
-  //     _updateNames(actualNames)
-      
-  //     return nameToAppend
-  //   } catch (err) {
-  //     return false
-  //   }
-  // }
-
-  // const toggleActiveName = (idToToggle, isActive = false) => {
-  //   const [actualNames, idx] = _findName(idToToggle)
-
-  //   if (idx === -1) {
-  //     return false
-  //   }
-
-  //   actualNames[idx].isActive = isActive
-  //   _updateNames(actualNames)
-
-  //   return true
-  // }
-
-  // const removeName = idToRemove => {
-  //   const [actualNames, idx] = _findName(idToRemove)
-
-  //   if (idx === -1) {
-  //     return false
-  //   }
-
-  //   const newNames = actualNames.toSpliced(idx, 1)
-  //   _updateNames(newNames)
-
-  //   return newNames
-  // }
-
-  // const _findName = idToFind => {
-  //   const actualNames = getNames() ?? []
-  //   const idx = actualNames.findIndex(({ id }) => id === idToFind)
-  //   return [actualNames, idx]
-  // }
-
-  // const _updateNames = names => setStorage('names', names)
-
-  return { getPhones, setNewPhone, removePhone, removeAllPhones }
+  return { getPhones, setNewPhone, removePhone, removeAllPhones, getPhoneById }
 })()
 
-export const { getPhones, setNewPhone, removePhone, removeAllPhones } = Phones
+export const { getPhones, setNewPhone, removePhone, removeAllPhones, getPhoneById } = Phones

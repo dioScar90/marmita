@@ -6,7 +6,7 @@ import {
   sortNames,
   changeNamePosition,
 } from './names.js'
-import { listenerCreator, getFormValues, getStorage, setStorage, clearNames } from './utils.js'
+import { listenerCreator, getFormValues, getStorage, setStorage, clearNames, clearPhones } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 import { getPhones, setNewPhone } from './phones.js'
 import Encryption from './encryption.js'
@@ -56,7 +56,7 @@ const getTextoFinal = (pedidos, total) => {
   return textoFinal
 }
 
-const addNewTableRowAfterInStorage = addedName => {
+const addNewTableRowAfterNameInStorage = addedName => {
   const template = document.createElement('template')
   const tbody = getTbodyTableNames()
   const lastTr = tbody.querySelector('tr:nth-last-child(1)')
@@ -88,9 +88,25 @@ const addNameInStorage = e => {
     return
   }
 
-  addNewTableRowAfterInStorage(addedName)
+  addNewTableRowAfterNameInStorage(addedName)
   closeBtn?.click()
   form.reset()
+}
+
+const addNewTableRowAfterPhoneInStorage = addedPhone => {
+  const template = document.createElement('template')
+  const tbody = getTbodyTablePhones()
+  const lastTr = tbody.querySelector('tr:nth-last-child(1)')
+
+  // const idx = lastTr ? lastTr.sectionRowIndex + 1 : 0
+  // const newTrHtml = getNewPhonesTableRow(addedPhone, idx, true)
+  const newTrHtml = getNewPhonesTableRow(addedPhone, true)
+  template.innerHTML = newTrHtml
+
+  tbody.append(template.content)
+  const newTr = tbody.lastElementChild
+
+  newTr.addEventListener('animationend', () => newTr.classList.remove('blink'))
 }
 
 const addPhoneInStorage = e => {
@@ -104,13 +120,13 @@ const addPhoneInStorage = e => {
   const modal = button.closest('#addPhone')
   const closeBtn = modal.querySelector('button.btn-close')
 
-  const addedPhone = setNewPhone(values.name)
+  const addedPhone = setNewPhone(values.phone)
 
   if (!addedPhone) {
     return
   }
 
-  addNewTableRowAfterInStorage(addedPhone)
+  addNewTableRowAfterPhoneInStorage(addedPhone)
   closeBtn?.click()
   form.reset()
 }
@@ -165,6 +181,19 @@ const removeAllNames = e => {
   tbody.replaceChildren()
 
   clearNames()
+
+  closeBtn.click()
+}
+
+const removeAllPhones = e => {
+  const button = e.currentTarget
+  const modal = button.closest('#removeAllPhones')
+  const closeBtn = modal.querySelector('button.btn-close')
+
+  const tbody = document.querySelector('#table_phones > tbody:last-child')
+  tbody.replaceChildren()
+
+  clearPhones()
 
   closeBtn.click()
 }
@@ -368,6 +397,26 @@ const onclickTableNames = e => {
     prepareChangeName(tr, button.dataset.order)
     return
   }
+}
+
+const onclickTablePhones = e => {
+  const button = e.target.closest('button:is([data-remove], [data-order])')
+
+  if (!button) {
+    return
+  }
+
+  const tr = button.closest('tr')
+
+  if ('remove' in button.dataset) {
+    confirmRemovePhone(tr.dataset)
+    return
+  }
+
+  // if ('order' in button.dataset) {
+  //   prepareChangePhone(tr, button.dataset.order)
+  //   return
+  // }
 }
 
 const onchangeTableNames = e => {
@@ -621,10 +670,10 @@ const formatPhoneNumber = phone => {
   if (typeof phone !== 'string') {
     throw new Error('Input must be a string')
   }
-
+  
   // Remove non-numeric characters from the input
   const cleanedNumber = phone.replace(/\D/g, '')
-
+  
   // Check if the cleaned number has at least 7 digits
   if (cleanedNumber.length < 11) {
     throw new Error('Phone number must have at least 11 digits')
@@ -639,14 +688,53 @@ const formatPhoneNumber = phone => {
   return formattedPhoneNumber
 }
 
-const getNewPhonesTableRow = (phone, blink = false) => {
+// const prepareChangePhone = (tr, order) => {
+//   const asc = order === 'up'
+//   changePositionTableRows(tr, asc)
+
+//   const phones = changePhonePosition(tr.dataset.phoneId, tr.sectionRowIndex)
+
+//   if (!phones) {
+//     return
+//   }
+
+//   mountTablePhones(phones)
+// }
+
+const confirmRemovePhone = ({ phoneId, phone }) => {
+  const buttonOpen = document.querySelector('button[data-bs-target="#removePhone"]')
+
+  const titleSpan = document.querySelector('#removePhone .modal-title span[data-phone]')
+  const paragSpan = document.querySelector('#removePhone .modal-body span[data-phone]')
+  const buttonConfirm = document.querySelector(
+    '#removePhone .modal-footer button[data-remove-confirm]'
+  )
+
+  titleSpan.innerText = phone
+  paragSpan.innerText = phone
+  buttonConfirm.dataset.phone = phone
+  buttonConfirm.dataset.phoneId = phoneId
+
+  buttonOpen.click()
+}
+
+const getNewPhonesTableRow = ({ id, phone, isActive }, blink = false) => {
+  const checked = isActive ? 'checked' : ''
+  const radioId = `status_${id}`
+
   const blinkClass = blink ? 'class="blink"' : ''
 
   const newTR = `
-    <tr ${blinkClass} draggable="true">
+    <tr ${blinkClass} data-phone-id="${id}" data-phone="${phone}" draggable="true">
       <th scope="row"></th>
       <td>
         ${formatPhoneNumber(phone)}
+      </td>
+      <td class="col col-md-3">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="${radioId}" ${checked} data-status>
+          <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
+        </div>
       </td>
       <td class="col col-md-2">
         <div class="row">
@@ -688,7 +776,7 @@ const mountTablePhones = (phonesArg = null) => {
   }
 
   const phones = phonesArg ?? getPhones()
-
+  
   const template = document.createElement('template')
   const tbody = getTbodyTablePhones()
 
@@ -847,8 +935,10 @@ const createEvents = () => {
     ['click', 'button[data-sort-names]', sortNamesInTable],
     ['click', '#plus_one_more_option', insertPlusOneOption],
     ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+    ['click', '#table_phones > tbody:not(.for-empty-table)', onclickTablePhones],
 
     ['change', '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    // ['change', '#table_phones > tbody:not(.for-empty-table)', onchangeTablePhones],
     ['change', '#switch_lang', changeLang],
 
     ['submit', '#form-marmitas', formSubmit],
