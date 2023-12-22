@@ -6,9 +6,16 @@ import {
   sortNames,
   changeNamePosition,
 } from './names.js'
-import { listenerCreator, getFormValues, getStorage, setStorage, clearNames, clearPhones } from './utils.js'
+import { getPhones, setNewPhone, removePhone, removeAllPhones } from './phones.js'
+import {
+  listenerCreator,
+  getFormValues,
+  getStorage,
+  setStorage,
+  clearNames,
+  clearPhones,
+} from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
-import { getPhones, setNewPhone } from './phones.js'
 import Encryption from './encryption.js'
 
 const MAX_TYPES = 5
@@ -142,7 +149,7 @@ const focusInputText = e => {
   setTimeout(() => input.focus(), 500)
 }
 
-const removeTr = async (tr, names) => {
+const removeTrName = async (tr, names) => {
   tr.classList.add('to-remove')
   tr.addEventListener('transitionend', () => {
     tr.remove()
@@ -164,7 +171,37 @@ const removeNameInStorage = e => {
     }
 
     const tr = document.querySelector(`tr[data-name-id="${id}"`)
-    removeTr(tr, names)
+    removeTrName(tr, names)
+
+    closeBtn?.click()
+  } catch (err) {
+    alert(err.toString())
+  }
+}
+
+const removeTrPhone = async (tr, phones) => {
+  tr.classList.add('to-remove')
+  tr.addEventListener('transitionend', () => {
+    tr.remove()
+    mountTablePhones(phones)
+  }, {once: true})
+}
+
+const removePhoneInStorage = e => {
+  try {
+    const button = e.currentTarget
+    const modal = button.closest('#removePhone')
+    const closeBtn = modal.querySelector('button.btn-close')
+
+    const id = button.dataset?.phoneId
+    const phones = removePhone(id)
+
+    if (!phones) {
+      return
+    }
+
+    const tr = document.querySelector(`tr[data-phone-id="${id}"`)
+    removeTrPhone(tr, phones)
 
     closeBtn?.click()
   } catch (err) {
@@ -185,7 +222,7 @@ const removeAllNames = e => {
   closeBtn.click()
 }
 
-const removeAllPhones = e => {
+const removeAllPhonesInStorage = e => {
   const button = e.currentTarget
   const modal = button.closest('#removeAllPhones')
   const closeBtn = modal.querySelector('button.btn-close')
@@ -572,7 +609,7 @@ const confirmRemoveName = ({ nameId, name }) => {
   const titleSpan = document.querySelector('#removeName .modal-title span[data-name]')
   const paragSpan = document.querySelector('#removeName .modal-body span[data-name]')
   const buttonConfirm = document.querySelector(
-    '#removeName .modal-footer button[data-remove-confirm]'
+    '#removeName .modal-footer button[data-remove-name-confirm]'
   )
 
   titleSpan.innerText = name
@@ -608,12 +645,12 @@ const getNewNamesTableRow = ({ id, name, isActive }, idx, blink = false) => {
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
-          <div class="col px-1">
+          <div class="col px-1" hidden>
             <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down">
               <i class="fa-solid fa-caret-down"></i>
             </button>
           </div>
-          <div class="col px-1">
+          <div class="col px-1" hidden>
             <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up">
               <i class="fa-solid fa-caret-up"></i>
             </button>
@@ -670,10 +707,10 @@ const formatPhoneNumber = phone => {
   if (typeof phone !== 'string') {
     throw new Error('Input must be a string')
   }
-  
+
   // Remove non-numeric characters from the input
   const cleanedNumber = phone.replace(/\D/g, '')
-  
+
   // Check if the cleaned number has at least 7 digits
   if (cleanedNumber.length < 11) {
     throw new Error('Phone number must have at least 11 digits')
@@ -707,7 +744,7 @@ const confirmRemovePhone = ({ phoneId, phone }) => {
   const titleSpan = document.querySelector('#removePhone .modal-title span[data-phone]')
   const paragSpan = document.querySelector('#removePhone .modal-body span[data-phone]')
   const buttonConfirm = document.querySelector(
-    '#removePhone .modal-footer button[data-remove-confirm]'
+    '#removePhone .modal-footer button[data-remove-phone-confirm]'
   )
 
   titleSpan.innerText = phone
@@ -736,19 +773,19 @@ const getNewPhonesTableRow = ({ id, phone, isActive }, blink = false) => {
           <label class="form-check-label fw-bold" for="${radioId}" data-ativo="Ativo" data-inativo="Inativo"></label>
         </div>
       </td>
-      <td class="col col-md-2">
+      <td class="col-1">
         <div class="row">
           <div class="col px-1">
             <button type="button" class="btn btn-outline-danger btn-sm m-0" data-remove>
               <i class="far fa-trash-alt"></i>
             </button>
           </div>
-          <div class="col px-1">
+          <div class="col px-1" hidden>
             <button type="button" class="btn btn-outline-warning btn-sm m-0" data-order="down">
               <i class="fa-solid fa-caret-down"></i>
             </button>
           </div>
-          <div class="col px-1">
+          <div class="col px-1" hidden>
             <button type="button" class="btn btn-outline-success btn-sm m-0" data-order="up">
               <i class="fa-solid fa-caret-up"></i>
             </button>
@@ -776,33 +813,20 @@ const mountTablePhones = (phonesArg = null) => {
   }
 
   const phones = phonesArg ?? getPhones()
-  
+
   const template = document.createElement('template')
   const tbody = getTbodyTablePhones()
-
+  
   for (const p of phones) {
     const newTR = getNewPhonesTableRow(p)
     template.innerHTML += newTR
   }
-
-  // for (const idx in phones) {
-  //   const i = +idx
-  //   const tr = tbody.querySelector(`tr:nth-child(${i + 1})`)
-
-  //   if (!tr) {
-  //     const newTR = getNewPhonesTableRow(phones[i], i, blink)
-  //     template.innerHTML += newTR
-  //     continue
-  //   }
-
-  //   updatePhonesTableRow(tr, phones[i])
-  // }
-
+  
   if (!template.content.childElementCount) {
     return
   }
 
-  tbody.append(template.content)
+  tbody.replaceChildren(template.content)
 }
 
 const endingDragController = e => {
@@ -829,25 +853,25 @@ const getByChecks = limit => {
   return stylesheets.join('\n')
 }
 
-const formatarNumero = (e) => {
+const formatarNumero = e => {
   const input = e.currentTarget
   const valorDigitado = input.value
-  
+
   // Remove todos os caracteres não numéricos do input
   const numeroLimpo = valorDigitado.replace(/\D/g, '')
-  
+
   if (numeroLimpo === '') {
     input.classList.remove('typing', 'matched')
     input.value = numeroLimpo
     return
   }
-  
+
   // Aplica o padrão de formatação aos dígitos
   const numeroFormatado = numeroLimpo.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-  
+
   // Atualiza o valor do input com o número formatado
   input.value = numeroFormatado
-  
+
   input.classList.add('typing')
   input.classList.toggle('matched', input.checkValidity())
 }
@@ -919,19 +943,17 @@ const defineLangHtml = (lang = null) => {
 }
 
 const routerCheck = () => {
-  const acceptedPages = [
-    'index',
-    'names',
-    // 'phones',
-  ]
+  const acceptedPages = ['index', 'names', 'phones']
   return acceptedPages.some(page => isPage(page))
 }
 
 const createEvents = () => {
   const events = [
     ['click', 'button[data-copiar]', copyText],
-    ['click', 'button[data-remove-confirm]', removeNameInStorage],
-    ['click', 'button[data-remove-all-confirm]', removeAllNames],
+    ['click', 'button[data-remove-name-confirm]', removeNameInStorage],
+    ['click', 'button[data-remove-phone-confirm]', removePhoneInStorage],
+    ['click', 'button[data-remove-all-names-confirm]', removeAllNames],
+    ['click', 'button[data-remove-all-phones-confirm]', removeAllPhonesInStorage],
     ['click', 'button[data-sort-names]', sortNamesInTable],
     ['click', '#plus_one_more_option', insertPlusOneOption],
     ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
@@ -968,7 +990,7 @@ const init = () => {
   }
 
   Encryption.checkEncryptionKey()
-  
+
   defineLangHtml()
   mountCssColor()
   mountFormElements()

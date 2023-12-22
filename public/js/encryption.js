@@ -56,9 +56,6 @@ class Encryption {
   static generateKey = () => this.#generateKey()
 
   static checkEncryptionKey() {
-    console.log('nothing yet...')
-    return
-    
     const key = this.#getEncryptionKey()
     
     if (!key) {

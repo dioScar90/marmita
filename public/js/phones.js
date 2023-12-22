@@ -28,37 +28,20 @@ const Phones = (() => {
     } catch (err) {
       return false
     }
-
-    const phones = getPhones()
-
-    console.log(newPhone)
-
-    if (phones.includes(newPhone)) {
-      return false
-    }
-    
-    phones.push(newPhone)
-    const encryptedPhones = phones.map(p => Encryption.encrypt(p))
-
-    console.log(encryptedPhones)
-
-    setStorage('phones', encryptedPhones)
-    return newPhone
   }
 
-  const removePhone = (phone) => {
-    const phones = getPhones()
-    const idx = phones.findIndex(phone)
-
+  const removePhone = (phoneId) => {
+    const phones = _getEncryptedPhones()
+    const idx = phones.findIndex(({ id }) => id === phoneId)
+    
     if (idx === -1) {
       return false
     }
 
-    const phonesWithoutInformedPhone = phones.toSpliced(idx, 1)
-    const newPhones = phonesWithoutInformedPhone.map(p => Encryption.encrypt(p))
-
+    const newPhones = phones.toSpliced(idx, 1)
+    
     setStorage('phones', newPhones)
-    return true
+    return getPhones()
   }
 
   const removeAllPhones = () => clearPhones()
