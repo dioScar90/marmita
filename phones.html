@@ -43,7 +43,7 @@
               <a class="nav-link" href="names.html" data-content data-en="Names" data-pt-br="Nomes"></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="index.html" data-content data-en="Phones" data-pt-br="Telefones"></a>
+              <a class="nav-link active" href="phones.html" data-content data-en="Phones" data-pt-br="Telefones"></a>
             </li>
           </ul>
 
@@ -124,19 +124,19 @@
 
       <div class="col-4 col-md-3 row justify-content-center">
         <button type="button" class="btn btn-primary text-nowrap w-auto" data-bs-toggle="modal"
-          data-bs-target="#addName" data-content data-en="Add" data-pt-br="Adicionar">
+          data-bs-target="#addPhone" data-content data-en="Add" data-pt-br="Adicionar">
           <i class="fa-solid fa-plus"></i>
         </button>
       </div>
     </div>
 
-    <div class="modal fade" id="addName" tabindex="-1" role="dialog" aria-labelledby="addNameTitle" aria-hidden="true">
+    <div class="modal fade" id="addPhone" tabindex="-1" role="dialog" aria-labelledby="addPhoneTitle" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
-          <form id="adicionar-nome">
+          <form id="adicionar-phone">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Add name"
-                data-pt-br="Adicionar nome"></h5>
+              <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Add phone"
+                data-pt-br="Adicionar Telefone"></h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-bs-label="Close">
                 <span aria-hidden="true"></span>
               </button>
@@ -146,14 +146,21 @@
               <p data-content data-en="Be useful at least once in your life and help to feed the data base:"
                 data-pt-br="Seja útil pelo menos uma vez na sua vida e ajude alimentar o banco de dados:"></p>
 
-              <div class="input-group mb-3">
+              <div class="input-group">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputGroup-sizing-default" data-content data-en="New name"
-                    data-pt-br="Novo nome"></span>
+                  <span class="input-group-text" id="inputGroup-sizing-default" data-content data-en="New phone"
+                    data-pt-br="Novo telefone"></span>
                 </div>
-                <input type="text" class="form-control" name="name" aria-label="Default"
-                  aria-describedby="inputGroup-sizing-default">
+                <input type="tel" class="form-control" id="phone" name="phone"
+                placeholder="(xx) 9xxxx-xxxx" pattern="\(\d{2}\) 9\d{4}-\d{4}" required>
               </div>
+
+              <small>
+                <span data-content data-en="Format" data-pt-br="Formato"></span>:
+                <em>(xx) 9xxxx-xxxx</em>
+                -
+                <span data-content data-en="Type only numbers" data-pt-br="Digite apenas números"></span>
+              </small>
             </div>
 
             <div class="modal-footer">

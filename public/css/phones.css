@@ -83,6 +83,16 @@ button[data-sort-names] {
   }
 }
 
+#phone.typing {
+  background-color: #ecedd4;
+  color: black;
+}
+
+#phone.matched {
+  background-color: #b4eab9;
+  color: black;
+}
+
 @keyframes blink {
   0% {
     opacity: 0;

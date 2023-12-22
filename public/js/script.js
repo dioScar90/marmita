@@ -8,7 +8,7 @@ import {
 } from './names.js'
 import { listenerCreator, getFormValues, getStorage, setStorage, clearNames } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
-import { getPhones, setPhone } from './phones.js'
+import { getPhones, setNewPhone } from './phones.js'
 import Encryption from './encryption.js'
 
 const MAX_TYPES = 5
@@ -89,6 +89,28 @@ const addNameInStorage = e => {
   }
 
   addNewTableRowAfterInStorage(addedName)
+  closeBtn?.click()
+  form.reset()
+}
+
+const addPhoneInStorage = e => {
+  e.preventDefault()
+
+  const form = e.target
+  const button = e.submitter
+
+  const values = getFormValues(form)
+
+  const modal = button.closest('#addPhone')
+  const closeBtn = modal.querySelector('button.btn-close')
+
+  const addedPhone = setNewPhone(values.name)
+
+  if (!addedPhone) {
+    return
+  }
+
+  addNewTableRowAfterInStorage(addedPhone)
   closeBtn?.click()
   form.reset()
 }
@@ -719,6 +741,29 @@ const getByChecks = limit => {
   return stylesheets.join('\n')
 }
 
+const formatarNumero = (e) => {
+  const input = e.currentTarget
+  const valorDigitado = input.value
+  
+  // Remove todos os caracteres não numéricos do input
+  const numeroLimpo = valorDigitado.replace(/\D/g, '')
+  
+  if (numeroLimpo === '') {
+    input.classList.remove('typing', 'matched')
+    input.value = numeroLimpo
+    return
+  }
+  
+  // Aplica o padrão de formatação aos dígitos
+  const numeroFormatado = numeroLimpo.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+  
+  // Atualiza o valor do input com o número formatado
+  input.value = numeroFormatado
+  
+  input.classList.add('typing')
+  input.classList.toggle('matched', input.checkValidity())
+}
+
 const getStylesheetColors = () => {
   const radioBeforeContent = `\\2713`
   const whiteSpace = `\\0000a0`
@@ -808,6 +853,9 @@ const createEvents = () => {
 
     ['submit', '#form-marmitas', formSubmit],
     ['submit', '#adicionar-nome', addNameInStorage],
+    ['submit', '#adicionar-phone', addPhoneInStorage],
+
+    ['input', '#phone', formatarNumero],
 
     ['dragstart', '#table_names > tbody:not(.for-empty-table)', startingDrag],
     ['dragend', '#table_names > tbody:not(.for-empty-table)', endingDragController],

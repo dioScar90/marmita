@@ -8,7 +8,7 @@ const Phones = (() => {
     return phones
   }
 
-  const setPhone = (newPhone) => {
+  const setNewPhone = (newPhone) => {
     const phones = getPhones()
 
     if (phones.includes(newPhone)) {
@@ -19,7 +19,7 @@ const Phones = (() => {
     const encryptedPhones = phones.map(p => Encryption.encrypt(p))
 
     setStorage('phones', encryptedPhones)
-    return true
+    return newPhone
   }
 
   const removePhone = (phone) => {
@@ -135,7 +135,7 @@ const Phones = (() => {
 
   // const _updateNames = names => setStorage('names', names)
 
-  return { getPhones, setPhone, removePhone, removeAllPhones }
+  return { getPhones, setNewPhone, removePhone, removeAllPhones }
 })()
 
-export const { getPhones, setPhone, removePhone, removeAllPhones } = Phones
+export const { getPhones, setNewPhone, removePhone, removeAllPhones } = Phones
