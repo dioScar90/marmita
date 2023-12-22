@@ -943,7 +943,11 @@ const defineLangHtml = (lang = null) => {
 }
 
 const routerCheck = () => {
-  const acceptedPages = ['index', 'names', 'phones']
+  const acceptedPages = [
+    'index',
+    'names',
+    // 'phones',
+  ]
   return acceptedPages.some(page => isPage(page))
 }
 
