@@ -14,11 +14,13 @@ import {
   setStorage,
   clearNames,
   clearPhones,
+  cssColors,
 } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 import Encryption from './encryption.js'
 
 const MAX_TYPES = 5
+const TAMANHOS = ['P', 'M']
 
 const isPage = page => {
   const thisPage = location.pathname.split('/').at(-1)
@@ -33,12 +35,6 @@ const isPage = page => {
 const isIndexPage = () => isPage('index')
 const isNamesPage = () => isPage('names')
 const isPhonesPage = () => isPage('phones')
-
-const generateRandomHexColor = () => {
-  // Generate a random hex color code (e.g., #RRGGBB)
-  const randomColor = '#' + Math.floor(Math.random() * 16_777_215).toString(16)
-  return randomColor
-}
 
 const getTextoFinal = (pedidos, total) => {
   const pedidosJoin = pedidos.join('\n\n')
@@ -306,10 +302,8 @@ const insertAlertMessage = () => {
   divBotoesForm.insertAdjacentHTML('beforebegin', alertMessage)
 }
 
-const getHeadSalada = () => `Marmita c/ 2 ovos, 2 bifes e 4 saquinhos de salada *(sem pepino)*`
-const getHeadOpcao = opcao => `Opção *${opcao}*, tamanho *P*`
-
-const getBodyComNomes = nomes => nomes.map(nome => `\n- ${nome}`).join('')
+const getHeadOpcao = ([opcao, tamanho]) => `Opção *${opcao}*, tamanho *${tamanho}*`
+const getBodyComNomes = (nomes) => nomes.map(({ name }) => `\n- ${name}`).join('')
 
 const sendTextToWhatsAppWeb = () => {
   const textoFinal = sessionStorage.getItem('textoFinal')
@@ -322,26 +316,16 @@ const sendTextToWhatsAppWeb = () => {
   location = 'https://wa.me/5518996202605/?text=' + parsed
 }
 
-const gerarPedidosObj = values => {
-  const obj = {}
+const gerarPedidosObj = (values) => Object.groupBy(values, ({ value }) => value)
+const getTotalMarmitas = (marmitas) => marmitas.length
 
-  for (const key in values) {
-    const value = values[key]
-
-    obj[value] ??= []
-    obj[value].push(key)
-  }
-
-  return obj
-}
-
-const getPedidosParaTextoFinal = pedidosObj => {
+const getPedidosParaTextoFinal = (pedidosObj) => {
   const pedidos = []
 
   for (const key in pedidosObj) {
     const value = pedidosObj[key]
-
-    const pedidoHead = key === 'salada' ? getHeadSalada() : getHeadOpcao(key)
+    
+    const pedidoHead = getHeadOpcao(key)
     const body = getBodyComNomes(value)
     const item = pedidoHead + body
 
@@ -355,7 +339,7 @@ const formSubmit = e => {
   e.preventDefault()
 
   const form = e.target
-  const values = getFormValues(form)
+  const values = getFormValues(form, true)
 
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
@@ -366,7 +350,7 @@ const formSubmit = e => {
     return
   }
 
-  const total = Object.keys(values).length
+  const total = getTotalMarmitas(values)
   const textoFinal = getTextoFinal(pedidos, total)
 
   // sendTextToWhatsAppWeb()
@@ -398,7 +382,7 @@ const formSubmit = e => {
 }
 
 const insertPlusOneOption = () => {
-  const selector = `[data-nomes] > dl > dd:not(:has(:nth-child(${MAX_TYPES}))) > div:nth-last-child(2)`
+  const selector = `[data-nomes] > dl > dd:not(:has(:nth-child(${MAX_TYPES}))) > div:last-child`
   const ultimasDivsValuesNumericos = document.querySelectorAll(selector)
 
   if (ultimasDivsValuesNumericos.length === 0) {
@@ -408,7 +392,9 @@ const insertPlusOneOption = () => {
 
   ultimasDivsValuesNumericos.forEach(div => {
     const input = div.querySelector('input')
-    const newValue = +input.value + 1
+    console.log('input', input)
+    const newValue = +input.dataset.type + 1
+    console.log('newValue', newValue)
     const nome = input.name
     const newDiv = getNewDivOption(newValue, nome)
 
@@ -469,37 +455,44 @@ const onchangeTableNames = e => {
   toggleActiveName(id, isActive)
 }
 
-const getNewDivOption = (value, nome) => {
-  const idRadio = 'radio_' + value + '_' + nome
+const getNewDivOption = (opt, nome) => {
+  const idRadioP = 'radio_' + opt + '_' + nome + '_P'
+  const idRadioM = 'radio_' + opt + '_' + nome + '_M'
+  
+  const contentP = isNaN(opt) ? 'Op. 1 P' : 'Op. ' + opt + ' P'
+  const contentM = isNaN(opt) ? 'Op. 1 M' : 'Op. ' + opt + ' M'
 
-  const dataEn = isNaN(value) ? 'Salad only' : 'Option ' + value
-  const dataPtBr = isNaN(value) ? 'Só salada' : 'Opção ' + value
-
+  const valueP = opt + 'P'
+  const valueM = opt + 'M'
+  
   return `
-    <div class="form-check form-check-inline option-div">
-      <input class="form-check-input" type="radio" name="${nome}" id="${idRadio}" value="${value}">
-      <label class="form-check-label" for="${idRadio}" data-nomes data-content data-en="${dataEn}" data-pt-br="${dataPtBr}"></label>
+    <div class="col-auto align-items-center">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" data-type="${opt}" name="${nome}" id="${idRadioP}" value="${valueP}">
+        <label class="form-check-label" for="${idRadioP}" data-nomes data-content data-en="${contentP}" data-pt-br="${contentP}"></label>
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" data-type="${opt}" name="${nome}" id="${idRadioM}" value="${valueM}">
+        <label class="form-check-label" for="${idRadioM}" data-nomes data-content data-en="${contentM}" data-pt-br="${contentM}"></label>
+      </div>
     </div>
   `
 }
 
-const getOptionSalad = nome => getNewDivOption('salada', nome)
-
 const getNewFormElement = nome => {
   const option1 = getNewDivOption(1, nome)
   const option2 = getNewDivOption(2, nome)
-  const salada = getOptionSalad(nome)
-
+  
   return `
     <dl class="row justify-content-center">
       <dt class="col-4 col-md-2">
-        <label>${nome}</label>
+        <span class="name-to-order">${nome}</span>
       </dt>
       
-      <dd class="col-8 col-md-auto">
+      <dd class="col-8 col-md-auto row">
         ${option1}
         ${option2}
-        ${salada}
       </dd>
     </dl>
   `
@@ -829,7 +822,7 @@ const mountTablePhones = (phonesArg = null) => {
   tbody.replaceChildren(template.content)
 }
 
-const endingDragController = e => {
+const endingDragController = (e) => {
   const names = endingDrag(e)
 
   if (!names) {
@@ -839,21 +832,7 @@ const endingDragController = e => {
   mountTableNames(names)
 }
 
-const getByChecks = limit => {
-  const last = limit - 1
-  const stylesheets = []
-
-  for (let i = 0; i < limit; i++) {
-    const value = i === last ? 'salada' : (i + 1).toString()
-    const color = generateRandomHexColor()
-    const sheet = `&:has(input[value="${value}"]:checked) { --color-checked-mark: ${color} }`
-    stylesheets.push(sheet)
-  }
-
-  return stylesheets.join('\n')
-}
-
-const formatarNumero = e => {
+const formatarNumero = (e) => {
   const input = e.currentTarget
   const valorDigitado = input.value
 
@@ -876,46 +855,13 @@ const formatarNumero = e => {
   input.classList.toggle('matched', input.checkValidity())
 }
 
-const getStylesheetColors = () => {
-  const radioBeforeContent = `\\2713`
-  const whiteSpace = `\\0000a0`
-  const stylesheets = getByChecks(MAX_TYPES)
-
-  return `
-    [data-nomes] > dl {
-      &:not(:last-of-type) {
-          margin-bottom: 1rem;
-      }
-      
-      &:has(input:checked) {
-        & > dt > label {
-          position: absolute;
-          color: var(--color-checked-mark);
-          
-          &::before {
-            content: '${radioBeforeContent}' '${whiteSpace}';
-          }
-        }
-        
-        & input:checked {
-          --value-radio: attr(value);
-        }
-        
-        ${stylesheets}
-      }
-    }
-  `
-}
-
 const mountCssColor = () => {
   if (!isIndexPage()) {
     return
   }
 
-  const style = document.createElement('style')
-  style.innerHTML = getStylesheetColors()
-
-  document.head.append(style)
+  
+  cssColors.mount(MAX_TYPES, TAMANHOS)
 }
 
 const getLang = defaultLang => {
