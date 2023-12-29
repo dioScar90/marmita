@@ -1,9 +1,9 @@
 html {
-  &[lang="en"] body [data-content]::after {
+  &[lang="en"] body [data-content]::before {
     content: attr(data-en);
   }
 
-  &[lang="pt-br"] body [data-content]::after {
+  &[lang="pt-br"] body [data-content]::before {
     content: attr(data-pt-br);
   }
 }
@@ -84,9 +84,39 @@ button[disabled] {
   }
 }
 
-input[type="checkbox"],
-input[type="checkbox"] + label {
+[data-nomes] dd {
+  & .tamanho:has(> .form-check) {
+    display: flex;
+    justify-content: center;
+    font-size: 0.75em;
+  }
+
+  & input[type="radio"] + label::after {
+      content: ' - P';
+      font-weight: bold;
+  }
+
+  & input[type="checkbox"] + label {
+    font-weight: normal;
+  }
+
+  &:has(input[type="checkbox"]:checked) {
+    & input[type="radio"] + label::after {
+      font-weight: normal;
+    }
+
+    & input[type="checkbox"] + label {
+      font-weight: bold;
+    }
+  }
+}
+
+input:is([type="checkbox"], [type="radio"]) {
   cursor: pointer;
+
+  + label {
+    cursor: pointer;
+  }
 }
 
 dialog::after {
@@ -97,4 +127,18 @@ dialog::after {
   position: absolute;
   right: 1%;
   bottom: 1%;
+}
+
+#welcome .welcome {
+  & section {
+    display: none;
+  }
+
+  &[data-lang="pt-br"] section.pt-br {
+    display: block;
+  }
+
+  &[data-lang="en"] section.en {
+    display: block;
+  }
 }

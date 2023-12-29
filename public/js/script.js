@@ -316,7 +316,8 @@ const sendTextToWhatsAppWeb = () => {
   location = 'https://wa.me/5518996202605/?text=' + parsed
 }
 
-const gerarPedidosObj = (values) => Object.groupBy(values, ({ value }) => value)
+const gerarPedidosObj = (values) =>
+  Object.groupBy(values, ({ value }) => value)
 const getTotalMarmitas = (marmitas) => marmitas.length
 
 const getPedidosParaTextoFinal = (pedidosObj) => {
@@ -341,6 +342,8 @@ const formSubmit = e => {
   const form = e.target
   const values = getFormValues(form, true)
 
+  console.log('values', values)
+  
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
 
@@ -392,9 +395,7 @@ const insertPlusOneOption = () => {
 
   ultimasDivsValuesNumericos.forEach(div => {
     const input = div.querySelector('input')
-    console.log('input', input)
     const newValue = +input.dataset.type + 1
-    console.log('newValue', newValue)
     const nome = input.name
     const newDiv = getNewDivOption(newValue, nome)
 
@@ -435,11 +436,6 @@ const onclickTablePhones = e => {
     confirmRemovePhone(tr.dataset)
     return
   }
-
-  // if ('order' in button.dataset) {
-  //   prepareChangePhone(tr, button.dataset.order)
-  //   return
-  // }
 }
 
 const onchangeTableNames = e => {
@@ -455,26 +451,44 @@ const onchangeTableNames = e => {
   toggleActiveName(id, isActive)
 }
 
-const getNewDivOption = (opt, nome) => {
-  const idRadioP = 'radio_' + opt + '_' + nome + '_P'
-  const idRadioM = 'radio_' + opt + '_' + nome + '_M'
-  
-  const contentP = isNaN(opt) ? 'Op. 1 P' : 'Op. ' + opt + ' P'
-  const contentM = isNaN(opt) ? 'Op. 1 M' : 'Op. ' + opt + ' M'
+const onchangeFormNames = (e) => {
+  const div = e.target.closest('dd > div:has(:scope)')
+  const dd = div.closest('dd')
 
-  const valueP = opt + 'P'
-  const valueM = opt + 'M'
+  const switches = dd.querySelectorAll(`[type="checkbox"]:not(#${e.target.id})`)
+  const radios = dd.querySelectorAll('[type="radio"]')
+  const radioOfType = div.querySelector('[type="radio"]')
+  
+  if (e.target.type === 'radio') {
+    radioOfType.value = radioOfType.value[0] + 'P'
+    switches.forEach(stch => stch.checked = false)
+    return
+  }
+
+  radioOfType.value = radioOfType.value[0] + 'M'
+  
+  radios.forEach(rd => rd.checked = rd === radioOfType)
+  switches.forEach(stch => stch.checked = false)
+}
+
+const getNewDivOption = (opt, nome) => {
+  const idRadioP = 'radio_' + opt + '_' + nome
+  const idSwitch = 'switch_' + opt + '_' + nome
+  
+  const contentP = isNaN(opt) ? 'Op. 1' : 'Op. ' + opt
   
   return `
     <div class="col-auto align-items-center">
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" data-type="${opt}" name="${nome}" id="${idRadioP}" value="${valueP}">
+        <input class="form-check-input" type="radio" data-type="${opt}" name="${nome}" id="${idRadioP}" value="${opt}P">
         <label class="form-check-label" for="${idRadioP}" data-nomes data-content data-en="${contentP}" data-pt-br="${contentP}"></label>
       </div>
-
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" data-type="${opt}" name="${nome}" id="${idRadioM}" value="${valueM}">
-        <label class="form-check-label" for="${idRadioM}" data-nomes data-content data-en="${contentM}" data-pt-br="${contentM}"></label>
+      
+      <div class="tamanho">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="${idSwitch}">
+          <label class="form-check-label" for="${idSwitch}">M</label>
+        </div>
       </div>
     </div>
   `
@@ -485,7 +499,7 @@ const getNewFormElement = nome => {
   const option2 = getNewDivOption(2, nome)
   
   return `
-    <dl class="row justify-content-center">
+    <dl class="row justify-content-center mb-0">
       <dt class="col-4 col-md-2">
         <span class="name-to-order">${nome}</span>
       </dt>
@@ -909,6 +923,7 @@ const createEvents = () => {
     ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
     ['click', '#table_phones > tbody:not(.for-empty-table)', onclickTablePhones],
 
+    ['change', '[data-nomes]', onchangeFormNames],
     ['change', '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
     // ['change', '#table_phones > tbody:not(.for-empty-table)', onchangeTablePhones],
     ['change', '#switch_lang', changeLang],
@@ -931,6 +946,141 @@ const createEvents = () => {
   }
 }
 
+const getWelcomeButton = () => {
+  return `
+    <button id="openWelcome" data-bs-toggle="modal" data-bs-target="#welcome" hidden></button>
+  `
+}
+
+const getWelcomeSection = (item) => {
+  const { lang, title, workingTitle, workingItems, notWorkingTitle, notWorkingItems, } = item
+
+  const works = workingItems.map(a => `<li>${a}.</li>`).join('')
+  const notWorks = notWorkingItems.map(a => `<li>${a}.</li>`).join('')
+
+  return `
+    <section class="${lang}">
+      <h1>${title}.</h1>
+      
+      <ul>
+        <i class="fa-solid fa-toggle-on"></i>
+        ${workingTitle}:
+        ${works}
+      </ul>
+
+      <ul>
+        <i class="fa-solid fa-ban"></i>
+        ${notWorkingTitle}:
+        ${notWorks}
+      </ul>
+    </section>
+  `
+}
+
+const getWelcomeModal = (sections) => {
+  return `
+    <div class="modal fade" id="welcome" tabindex="-1" role="dialog" aria-labelledby="welcomeTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Welcome / Bem-vindo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-bs-label="Close">
+              <span aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div id="switch_lang">
+              <div class="d-flex justify-content-center">
+                <div class="div-lang-en">
+                  <input type="radio" class="btn-check" name="options-outlined" value="en" id="primary-outlined" autocomplete="off">
+                  <label class="w-100 btn btn-outline-primary btn-sm text-nowrap" for="primary-outlined">
+                    <img src="./public/img/flags/4x3/us.svg" alt="Flag of the United States" />
+                    <span class="fw-bold lang-description">EN</span>
+                  </label>
+                </div>
+                
+                <div class="div-lang-pt-br">
+                  <input type="radio" class="btn-check" name="options-outlined" value="pt-br" id="success-outlined" autocomplete="off">
+                  <label class="w-100 btn btn-outline-success btn-sm text-nowrap" for="success-outlined">
+                    <span class="fw-bold lang-description">PT-BR</span>
+                    <img src="./public/img/flags/4x3/br.svg" alt="Flag of Brazil" />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="welcome" data-lang="pt-br">${sections}</div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const getBaseWelcomeObjs = () => ([
+  {
+    lang: 'pt-br',
+    title: 'Sistema de pedido de marmita',
+    workingTitle: 'Funcionando',
+    workingItems: [
+      'Pedidos',
+      'Copiar mensagem gerada',
+      'Adição/remoção de nomes',
+    ],
+    notWorkingTitle: 'Não funcionando ainda',
+    notWorkingItems: [
+      'Envio direto ao WhatsApp',
+      'Adição/remoção de telefones',
+    ]
+  },
+  {
+    lang: 'en',
+    title: 'System of <s class="text-mute">a Down</s> lunch orders',
+    workingTitle: 'Working',
+    workingItems: [
+      'Orders',
+      'To copy generated message',
+      'Add/remove names',
+    ],
+    notWorkingTitle: 'Not working yet',
+    notWorkingItems: [
+      'Direct sending to WhatsApp',
+      'Add/remove phones',
+    ]
+  }
+])
+
+const welcomeMessage = () => {
+  if (!isIndexPage()) {
+    return
+  }
+
+  // const aqui = getStorage('welcome')
+
+  // if (aqui) {
+  //   return
+  // }
+  
+  const welcomeSections = getBaseWelcomeObjs().map(getWelcomeSection).join('')
+  const welcomeButton = getWelcomeButton()
+  const welcomeModal = getWelcomeModal(welcomeSections)
+  document.body.insertAdjacentHTML('beforeend', welcomeButton + welcomeModal)
+
+  const button = document.querySelector('#openWelcome')
+  const welcome = document.querySelector('#welcome')
+  button.click()
+
+  setStorage('welcome', true)
+}
+
 const init = () => {
   const pageOk = routerCheck()
 
@@ -950,6 +1100,8 @@ const init = () => {
   modifySortButtonAttribute()
 
   createEvents()
+
+  welcomeMessage()
 }
 
 document.addEventListener('DOMContentLoaded', init)

@@ -76,7 +76,7 @@ const cssColors = (() => {
             margin-bottom: 1rem;
         }
         
-        &:has(input:checked) {
+        &:has(input[type="radio"]:checked) {
           & > dt {
             position: relative;
             
@@ -90,7 +90,7 @@ const cssColors = (() => {
             }
           }
           
-          & input:checked {
+          & input[type="radio"]:checked {
             --value-radio: attr(value);
           }
           
