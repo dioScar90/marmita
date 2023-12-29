@@ -878,7 +878,7 @@ const mountCssColor = () => {
   cssColors.mount(MAX_TYPES, TAMANHOS)
 }
 
-const getLang = defaultLang => {
+const getLang = (defaultLang) => {
   if (!('lang' in localStorage)) {
     setStorage('lang', defaultLang)
   }
@@ -896,10 +896,10 @@ const changeLang = e => {
 const defineLangHtml = (lang = null) => {
   const html = document.querySelector('html')
   const langValue = lang ?? getLang(html.lang)
-  const input = document.querySelector(`#switch_lang input[value="${langValue}"]`)
+  const inputs = document.querySelectorAll(`[id*="switch_lang"] input[value="${langValue}"]`)
 
   html.lang = langValue
-  input.checked = true
+  inputs.forEach(input => input.checked = true)
 }
 
 const routerCheck = () => {
@@ -909,41 +909,6 @@ const routerCheck = () => {
     // 'phones',
   ]
   return acceptedPages.some(page => isPage(page))
-}
-
-const createEvents = () => {
-  const events = [
-    ['click', 'button[data-copiar]', copyText],
-    ['click', 'button[data-remove-name-confirm]', removeNameInStorage],
-    ['click', 'button[data-remove-phone-confirm]', removePhoneInStorage],
-    ['click', 'button[data-remove-all-names-confirm]', removeAllNames],
-    ['click', 'button[data-remove-all-phones-confirm]', removeAllPhonesInStorage],
-    ['click', 'button[data-sort-names]', sortNamesInTable],
-    ['click', '#plus_one_more_option', insertPlusOneOption],
-    ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
-    ['click', '#table_phones > tbody:not(.for-empty-table)', onclickTablePhones],
-
-    ['change', '[data-nomes]', onchangeFormNames],
-    ['change', '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
-    // ['change', '#table_phones > tbody:not(.for-empty-table)', onchangeTablePhones],
-    ['change', '#switch_lang', changeLang],
-
-    ['submit', '#form-marmitas', formSubmit],
-    ['submit', '#adicionar-nome', addNameInStorage],
-    ['submit', '#adicionar-phone', addPhoneInStorage],
-
-    ['input', '#phone', formatarNumero],
-
-    ['dragstart', '#table_names > tbody:not(.for-empty-table)', startingDrag],
-    ['dragend', '#table_names > tbody:not(.for-empty-table)', endingDragController],
-    ['dragover', '#table_names > tbody:not(.for-empty-table)', movingDragElement],
-
-    ['transitionend', '#addName', focusInputText],
-  ]
-
-  for (const [eventType, selector, func, options = {}] of events) {
-    listenerCreator.create(eventType, selector, func, options)
-  }
 }
 
 const getWelcomeButton = () => {
@@ -960,16 +925,16 @@ const getWelcomeSection = (item) => {
 
   return `
     <section class="${lang}">
-      <h1>${title}.</h1>
+      <h3>${title}.</h3>
       
       <ul>
-        <i class="fa-solid fa-toggle-on"></i>
+        <i class="fa-solid fa-toggle-on text-success"></i>
         ${workingTitle}:
         ${works}
       </ul>
 
       <ul>
-        <i class="fa-solid fa-ban"></i>
+        <i class="fa-solid fa-ban text-danger"></i>
         ${notWorkingTitle}:
         ${notWorks}
       </ul>
@@ -991,7 +956,7 @@ const getWelcomeModal = (sections) => {
           </div>
 
           <div class="modal-body">
-            <div id="switch_lang">
+            <div id="welcome_switch_lang">
               <div class="d-flex justify-content-center">
                 <div class="div-lang-en">
                   <input type="radio" class="btn-check" name="options-outlined" value="en" id="primary-outlined" autocomplete="off">
@@ -1058,6 +1023,14 @@ const getBaseWelcomeObjs = () => ([
   }
 ])
 
+const changeLangWelcome = (e) => {
+  const welcome = document.querySelector('#welcome .welcome')
+  console.log('welcome', welcome)
+  welcome.dataset.lang = e.target.value
+
+  changeLang(e)
+}
+
 const welcomeMessage = () => {
   if (!isIndexPage()) {
     return
@@ -1074,11 +1047,50 @@ const welcomeMessage = () => {
   const welcomeModal = getWelcomeModal(welcomeSections)
   document.body.insertAdjacentHTML('beforeend', welcomeButton + welcomeModal)
 
-  const button = document.querySelector('#openWelcome')
-  const welcome = document.querySelector('#welcome')
-  button.click()
+  setTimeout(() => {
+    const button = document.querySelector('#openWelcome')
+    // const welcome = document.querySelector('#welcome .welcome')
+    button.click()
+    
+    listenerCreator.create('change', '#welcome_switch_lang', changeLangWelcome)
+    setStorage('welcome', true)
+  }, 100)
+}
 
-  setStorage('welcome', true)
+const createEvents = () => {
+  const events = [
+    ['click', 'button[data-copiar]', copyText],
+    ['click', 'button[data-remove-name-confirm]', removeNameInStorage],
+    ['click', 'button[data-remove-phone-confirm]', removePhoneInStorage],
+    ['click', 'button[data-remove-all-names-confirm]', removeAllNames],
+    ['click', 'button[data-remove-all-phones-confirm]', removeAllPhonesInStorage],
+    ['click', 'button[data-sort-names]', sortNamesInTable],
+    ['click', '#plus_one_more_option', insertPlusOneOption],
+    ['click', '#table_names > tbody:not(.for-empty-table)', onclickTableNames],
+    ['click', '#table_phones > tbody:not(.for-empty-table)', onclickTablePhones],
+
+    ['change', '[data-nomes]', onchangeFormNames],
+    ['change', '#table_names > tbody:not(.for-empty-table)', onchangeTableNames],
+    // ['change', '#table_phones > tbody:not(.for-empty-table)', onchangeTablePhones],
+    ['change', '#switch_lang', changeLang],
+    ['change', '#welcome_switch_lang', changeLangWelcome],
+
+    ['submit', '#form-marmitas', formSubmit],
+    ['submit', '#adicionar-nome', addNameInStorage],
+    ['submit', '#adicionar-phone', addPhoneInStorage],
+
+    ['input', '#phone', formatarNumero],
+
+    ['dragstart', '#table_names > tbody:not(.for-empty-table)', startingDrag],
+    ['dragend', '#table_names > tbody:not(.for-empty-table)', endingDragController],
+    ['dragover', '#table_names > tbody:not(.for-empty-table)', movingDragElement],
+
+    ['transitionend', '#addName', focusInputText],
+  ]
+
+  for (const [eventType, selector, func, options = {}] of events) {
+    listenerCreator.create(eventType, selector, func, options)
+  }
 }
 
 const init = () => {
@@ -1091,6 +1103,8 @@ const init = () => {
 
   Encryption.checkEncryptionKey()
 
+  // welcomeMessage()
+
   defineLangHtml()
   mountCssColor()
   mountFormElements()
@@ -1100,8 +1114,6 @@ const init = () => {
   modifySortButtonAttribute()
 
   createEvents()
-
-  welcomeMessage()
 }
 
 document.addEventListener('DOMContentLoaded', init)

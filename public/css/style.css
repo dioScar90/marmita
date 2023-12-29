@@ -20,7 +20,7 @@ html {
   }
 }
 
-#switch_lang {
+#switch_lang, #welcome_switch_lang {
   position: absolute;
   width: 30%;
   left: 35%;
@@ -28,7 +28,7 @@ html {
   padding-bottom: var(--bs-navbar-brand-padding-y);
   top: 0;
 
-  [class^="div-lang"] {
+  & [class^="div-lang"] {
     width: 100px;
     display: flex;
     align-items: center;
@@ -130,6 +130,8 @@ dialog::after {
 }
 
 #welcome .welcome {
+  margin-top: 3rem;
+
   & section {
     display: none;
   }
