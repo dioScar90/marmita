@@ -884,7 +884,7 @@ const defineLangHtml = (lang = null) => {
   inputs.forEach(input => input.checked = true)
 }
 
-const routerCheck = () => {
+const isAuthorizedRouter = () => {
   const acceptedPages = [
     'index',
     'names',
@@ -1080,9 +1080,7 @@ const createEvents = () => {
 }
 
 const init = () => {
-  const pageOk = routerCheck()
-
-  if (!pageOk) {
+  if (!isAuthorizedRouter()) {
     location = 'index.html'
     return
   }
