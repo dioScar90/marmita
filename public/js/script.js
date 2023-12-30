@@ -366,6 +366,14 @@ const formSubmit = e => {
   insertAlertMessage()
 }
 
+const formReset = (e) => {
+  const radios = e.target.querySelectorAll('[type="radio"]')
+  const labels = e.target.querySelectorAll('[type="radio"] + label')
+
+  radios.forEach(rd => rd.value = rd.dataset.type + 'P')
+  labels.forEach(lb => lb.dataset.tamanho = 'P')
+}
+
 const insertPlusOneOption = () => {
   const selector = `[data-nomes] > dl > dd:not(:has(:nth-child(${MAX_TYPES}))) > div:last-child`
   const ultimasDivsValuesNumericos = document.querySelectorAll(selector)
@@ -433,37 +441,57 @@ const onchangeTableNames = e => {
   toggleActiveName(id, isActive)
 }
 
+const resetFormInputsValues = ({ radios, labels, switches }) => {
+  if (radios) {
+    radios.forEach(rd => rd.value = rd.dataset.type + 'P')
+  }
+
+  if (labels) {
+    labels.forEach(lb => lb.dataset.tamanho = 'P')
+  }
+
+  if (switches) {
+    switches.forEach(stch => stch.checked = false)
+  }
+}
+
 const onchangeFormNames = (e) => {
   const div = e.target.closest('dd > div:has(:scope)')
   const dd = div.closest('dd')
 
   const switches = dd.querySelectorAll(`[type="checkbox"]:not(#${e.target.id})`)
   const radios = dd.querySelectorAll('[type="radio"]')
-  const radioOfType = div.querySelector('[type="radio"]')
+  const labels = dd.querySelectorAll('[type="radio"] + label')
+
+  resetFormInputsValues({ radios, labels, switches })
 
   if (e.target.type === 'radio') {
-    radioOfType.value = radioOfType.value[0] + 'P'
-    switches.forEach(stch => stch.checked = false)
     return
   }
 
-  radioOfType.value = radioOfType.value[0] + 'M'
+  const radioOfType = div.querySelector('[type="radio"]')
+  const labelRadio = radioOfType.nextElementSibling
 
-  radios.forEach(rd => rd.checked = rd === radioOfType)
-  switches.forEach(stch => stch.checked = false)
+  const tamanho = e.target.checked ? 'M' : 'P'
+  radioOfType.value = radioOfType.dataset.type + tamanho
+  labelRadio.dataset.tamanho = tamanho
+
+  radioOfType.checked = true
 }
 
 const getNewDivOption = (opt, nome) => {
-  const idRadioP = 'radio_' + opt + '_' + nome
+  const idRadio = 'radio_' + opt + '_' + nome
   const idSwitch = 'switch_' + opt + '_' + nome
 
-  const contentP = isNaN(opt) ? 'Op. 1' : 'Op. ' + opt
+  const content = isNaN(opt) ? 'Op. 1' : 'Op. ' + opt
 
   return `
     <div class="col-auto align-items-center">
       <div class="form-check">
-        <input class="form-check-input" type="radio" data-type="${opt}" name="${nome}" id="${idRadioP}" value="${opt}P">
-        <label class="form-check-label" for="${idRadioP}" data-nomes data-content data-en="${contentP}" data-pt-br="${contentP}"></label>
+        <input class="form-check-input" type="radio" data-type="${opt}" name="${nome}" id="${idRadio}" value="${opt}P">
+        <label class="form-check-label" for="${idRadio}" data-nomes data-tamanho="P">
+          ${content}
+        </label>
       </div>
       
       <div class="tamanho">
@@ -1064,6 +1092,8 @@ const createEvents = () => {
     ['submit', '#form-marmitas', formSubmit],
     ['submit', '#adicionar-nome', addNameInStorage],
     ['submit', '#adicionar-phone', addPhoneInStorage],
+
+    ['reset', '#form-marmitas', formReset],
 
     ['input', '#phone', formatarNumero],
 

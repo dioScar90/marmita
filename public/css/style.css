@@ -92,22 +92,12 @@ button[disabled] {
   }
 
   & input[type="radio"] + label::after {
-      content: ' - P';
+      content: ' - ' attr(data-tamanho);
       font-weight: bold;
   }
 
   & input[type="checkbox"] + label {
     font-weight: normal;
-  }
-
-  &:has(input[type="checkbox"]:checked) {
-    & input[type="radio"] + label::after {
-      font-weight: normal;
-    }
-
-    & input[type="checkbox"] + label {
-      font-weight: bold;
-    }
   }
 }
 
