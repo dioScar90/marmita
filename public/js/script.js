@@ -180,7 +180,7 @@ const removeTrPhone = async (tr, phones) => {
   tr.addEventListener('transitionend', () => {
     tr.remove()
     mountTablePhones(phones)
-  }, {once: true})
+  }, { once: true })
 }
 
 const removePhoneInStorage = e => {
@@ -325,7 +325,7 @@ const getPedidosParaTextoFinal = (pedidosObj) => {
 
   for (const key in pedidosObj) {
     const value = pedidosObj[key]
-    
+
     const pedidoHead = getHeadOpcao(key)
     const body = getBodyComNomes(value)
     const item = pedidoHead + body
@@ -343,7 +343,7 @@ const formSubmit = e => {
   const values = getFormValues(form, true)
 
   console.log('values', values)
-  
+
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
 
@@ -458,7 +458,7 @@ const onchangeFormNames = (e) => {
   const switches = dd.querySelectorAll(`[type="checkbox"]:not(#${e.target.id})`)
   const radios = dd.querySelectorAll('[type="radio"]')
   const radioOfType = div.querySelector('[type="radio"]')
-  
+
   if (e.target.type === 'radio') {
     radioOfType.value = radioOfType.value[0] + 'P'
     switches.forEach(stch => stch.checked = false)
@@ -466,7 +466,7 @@ const onchangeFormNames = (e) => {
   }
 
   radioOfType.value = radioOfType.value[0] + 'M'
-  
+
   radios.forEach(rd => rd.checked = rd === radioOfType)
   switches.forEach(stch => stch.checked = false)
 }
@@ -474,9 +474,9 @@ const onchangeFormNames = (e) => {
 const getNewDivOption = (opt, nome) => {
   const idRadioP = 'radio_' + opt + '_' + nome
   const idSwitch = 'switch_' + opt + '_' + nome
-  
+
   const contentP = isNaN(opt) ? 'Op. 1' : 'Op. ' + opt
-  
+
   return `
     <div class="col-auto align-items-center">
       <div class="form-check">
@@ -497,7 +497,7 @@ const getNewDivOption = (opt, nome) => {
 const getNewFormElement = nome => {
   const option1 = getNewDivOption(1, nome)
   const option2 = getNewDivOption(2, nome)
-  
+
   return `
     <dl class="row justify-content-center mb-0">
       <dt class="col-4 col-md-2">
@@ -823,12 +823,12 @@ const mountTablePhones = (phonesArg = null) => {
 
   const template = document.createElement('template')
   const tbody = getTbodyTablePhones()
-  
+
   for (const p of phones) {
     const newTR = getNewPhonesTableRow(p)
     template.innerHTML += newTR
   }
-  
+
   if (!template.content.childElementCount) {
     return
   }
@@ -874,7 +874,7 @@ const mountCssColor = () => {
     return
   }
 
-  
+
   cssColors.mount(MAX_TYPES, TAMANHOS)
 }
 
@@ -959,16 +959,16 @@ const getWelcomeModal = (sections) => {
             <div id="welcome_switch_lang">
               <div class="d-flex justify-content-center">
                 <div class="div-lang-en">
-                  <input type="radio" class="btn-check" name="options-outlined" value="en" id="primary-outlined" autocomplete="off">
-                  <label class="w-100 btn btn-outline-primary btn-sm text-nowrap" for="primary-outlined">
+                  <input type="radio" class="btn-check" name="welcomeInputName" value="en" id="welcomeInputIdEn" autocomplete="off">
+                  <label class="w-100 btn btn-outline-primary btn-sm text-nowrap" for="welcomeInputIdEn">
                     <img src="./public/img/flags/4x3/us.svg" alt="Flag of the United States" />
                     <span class="fw-bold lang-description">EN</span>
                   </label>
                 </div>
                 
                 <div class="div-lang-pt-br">
-                  <input type="radio" class="btn-check" name="options-outlined" value="pt-br" id="success-outlined" autocomplete="off">
-                  <label class="w-100 btn btn-outline-success btn-sm text-nowrap" for="success-outlined">
+                  <input type="radio" class="btn-check" name="welcomeInputName" value="pt-br" id="welcomeInputIdBr" autocomplete="off">
+                  <label class="w-100 btn btn-outline-success btn-sm text-nowrap" for="welcomeInputIdBr">
                     <span class="fw-bold lang-description">PT-BR</span>
                     <img src="./public/img/flags/4x3/br.svg" alt="Flag of Brazil" />
                   </label>
@@ -1036,23 +1036,28 @@ const welcomeMessage = () => {
     return
   }
 
-  // const aqui = getStorage('welcome')
+  const aqui = getStorage('welcome')
 
-  // if (aqui) {
-  //   return
-  // }
-  
+  if (aqui) {
+    return
+  }
+
   const welcomeSections = getBaseWelcomeObjs().map(getWelcomeSection).join('')
   const welcomeButton = getWelcomeButton()
   const welcomeModal = getWelcomeModal(welcomeSections)
-  document.body.insertAdjacentHTML('beforeend', welcomeButton + welcomeModal)
+
+  const template = document.createElement('template')
+  template.innerHTML = welcomeButton + welcomeModal
+
+  const switchh = template.content.querySelector('#welcome_switch_lang')
+  const button = template.content.querySelector('#openWelcome')
+
+  document.body.append(template.content)
 
   setTimeout(() => {
-    const button = document.querySelector('#openWelcome')
-    // const welcome = document.querySelector('#welcome .welcome')
     button.click()
-    
-    listenerCreator.create('change', '#welcome_switch_lang', changeLangWelcome)
+
+    listenerCreator.create('change', switchh, changeLangWelcome)
     setStorage('welcome', true)
   }, 100)
 }
@@ -1103,7 +1108,7 @@ const init = () => {
 
   Encryption.checkEncryptionKey()
 
-  // welcomeMessage()
+  welcomeMessage()
 
   defineLangHtml()
   mountCssColor()
