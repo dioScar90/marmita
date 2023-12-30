@@ -1,6 +1,6 @@
 # Marmita
 
-This is an web app I developed to help me in doing the lunch orders of mine and of the job's collegues of mine.
+This is an web app I developed to help me in doing the lunch orders of mine and of my job's collegues.
 
 Want to mock your data manually? Copy/paste it on your browser console and write the names you want passing as a parameter `values: string[]` of `mockData`'s function:
 
