@@ -1025,7 +1025,6 @@ const getBaseWelcomeObjs = () => ([
 
 const changeLangWelcome = (e) => {
   const welcome = document.querySelector('#welcome .welcome')
-  console.log('welcome', welcome)
   welcome.dataset.lang = e.target.value
 
   changeLang(e)
