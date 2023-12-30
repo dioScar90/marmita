@@ -84,10 +84,7 @@ const addNameInStorage = e => {
 const addNewTableRowAfterPhoneInStorage = addedPhone => {
   const template = document.createElement('template')
   const tbody = getTbodyTablePhones()
-  const lastTr = tbody.querySelector('tr:nth-last-child(1)')
 
-  // const idx = lastTr ? lastTr.sectionRowIndex + 1 : 0
-  // const newTrHtml = getNewPhonesTableRow(addedPhone, idx, true)
   const newTrHtml = getNewPhonesTableRow(addedPhone, true)
   template.innerHTML = newTrHtml
 
@@ -290,16 +287,16 @@ const insertAlertMessage = () => {
 const getHeadOpcao = ([opcao, tamanho]) => `Opção *${opcao}*, tamanho *${tamanho}*`
 const getBodyComNomes = (nomes) => nomes.map(({ name }) => `\n- ${name}`).join('')
 
-const sendTextToWhatsAppWeb = () => {
-  const textoFinal = sessionStorage.getItem('textoFinal')
+// const sendTextToWhatsAppWeb = () => {
+//   const textoFinal = sessionStorage.getItem('textoFinal')
 
-  if (!textoFinal) {
-    return
-  }
+//   if (!textoFinal) {
+//     return
+//   }
 
-  const parsed = encodeURIComponent(textoFinal)
-  location = 'https://wa.me/5518996202605/?text=' + parsed
-}
+//   const parsed = encodeURIComponent(textoFinal)
+//   location = 'https://wa.me/5518996202605/?text=' + parsed
+// }
 
 const gerarPedidosObj = (values) =>
   Object.groupBy(values, ({ value }) => value)
@@ -790,14 +787,14 @@ const getNewPhonesTableRow = ({ id, phone, isActive }, blink = false) => {
   return newTR.trim()
 }
 
-const updatePhonesTableRow = (tr, { id, name, isActive }) => {
-  const checkbox = tr.querySelector('input[type=checkbox]')
+// const updatePhonesTableRow = (tr, { id, name, isActive }) => {
+//   const checkbox = tr.querySelector('input[type=checkbox]')
 
-  tr.dataset.nameId = id
-  checkbox.checked = isActive
+//   tr.dataset.nameId = id
+//   checkbox.checked = isActive
 
-  tr.children[1].innerText = name
-}
+//   tr.children[1].innerText = name
+// }
 
 const mountTablePhones = (phonesArg = null) => {
   if (!isPhonesPage()) {
