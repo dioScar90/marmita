@@ -26,6 +26,6 @@ const names = [
 mockData(names.sort())
 ```
 
-Replace _// Type here the names you want to mock..._ by the names you want to mock.
+Replace the line _// Type here the names..._ by the names you want to mock.
 
 Now you can order your lunch, and also add/remove or enable/disable names. :)
