@@ -5,3 +5,5 @@ src/
 bun.lockb
 package.json
 tsconfig.json
+*.lua
+
