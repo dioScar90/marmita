@@ -298,8 +298,7 @@ const getBodyComNomes = (nomes) => nomes.map(({ name }) => `\n- ${name}`).join('
 //   location = 'https://wa.me/5518996202605/?text=' + parsed
 // }
 
-const gerarPedidosObj = (values) =>
-  Object.groupBy(values, ({ value }) => value)
+const gerarPedidosObj = (values) => Object.groupBy(values, ({ value }) => value)
 const getTotalMarmitas = (marmitas) => marmitas.length
 
 const getPedidosParaTextoFinal = (pedidosObj) => {
@@ -323,8 +322,6 @@ const formSubmit = e => {
 
   const form = e.target
   const values = getFormValues(form, true)
-
-  console.log('values', values)
 
   const pedidosObj = gerarPedidosObj(values)
   const pedidos = getPedidosParaTextoFinal(pedidosObj)
@@ -510,11 +507,11 @@ const getNewFormElement = nome => {
 
   return `
     <dl class="row justify-content-center mb-0">
-      <dt class="col-4 col-md-2">
+      <dt class="col-4 col-md-2 mb-1">
         <span class="name-to-order">${nome}</span>
       </dt>
       
-      <dd class="col-8 col-md-auto row">
+      <dd class="col-8 col-md-auto mb-1 row">
         ${option1}
         ${option2}
       </dd>
