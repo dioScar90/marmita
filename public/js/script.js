@@ -1,5 +1,5 @@
 import { getNames, setNewName, toggleActiveName, removeName, sortNames, changeNamePosition } from './names.js'
-import { getPhones, setNewPhone, removePhone, removeAllPhones } from './phones.js'
+import { getPhones, setNewPhone, removePhone } from './phones.js'
 import { listenerCreator, getFormValues, getStorage, setStorage, clearNames, clearPhones, cssColors } from './utils.js'
 import { startingDrag, endingDrag, movingDragElement } from './drag_drop.js'
 import Encryption from './encryption.js'

@@ -13,7 +13,7 @@ const Names = (() => {
   }
 
   const _compareName = (n1, n2, asc) => asc ? n1.name.localeCompare(n2.name) : n2.name.localeCompare(n1.name)
-  
+
   const sortNames = () => {
     const asc = _getAscValue()
     const names = getNames()
@@ -23,40 +23,40 @@ const Names = (() => {
 
     return sortedNames
   }
-  
-  const _filaDumaEgua = (id, oldIdx, newIdx, actualNames) => {
-    const item = {...actualNames[oldIdx]}
+
+  const _changePositionAndReturnNewNames = (oldIdx, newIdx, actualNames) => {
+    const item = { ...actualNames[oldIdx] }
 
     const tempNames = actualNames.toSpliced(oldIdx, 1)
     const newNames = tempNames.toSpliced(newIdx, 0, item)
-    
+
     return newNames
   }
 
   const changeNamePosition = (id, newIdx) => {
     const [actualNames, oldIdx] = _findName(id)
-    
+
     if (oldIdx === -1 || newIdx === oldIdx) {
       return false
     }
-    
-    const newNames = _filaDumaEgua(id, oldIdx, newIdx, actualNames)
+
+    const newNames = _changePositionAndReturnNewNames(oldIdx, newIdx, actualNames)
     _updateNames(newNames)
-    
+
     return newNames
   }
 
   const setNewName = (name) => {
     try {
       const actualNames = getNames() ?? []
-      
+
       const isActive = true
       const id = self.crypto.randomUUID()
       const nameToAppend = { id, name, isActive }
-      
+
       actualNames.push(nameToAppend)
       _updateNames(actualNames)
-      
+
       return nameToAppend
     } catch (err) {
       return false
