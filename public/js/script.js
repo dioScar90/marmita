@@ -968,7 +968,7 @@ const getWelcomeModal = (sections) => {
                 <div class="div-lang-en">
                   <input type="radio" class="btn-check" name="welcomeInputName" value="en" id="welcomeInputIdEn" autocomplete="off">
                   <label class="w-100 btn btn-outline-primary btn-sm text-nowrap" for="welcomeInputIdEn">
-                    <img src="./public/img/flags/4x3/us.svg" alt="Flag of the United States" />
+                    <img src="./assets/img/flags/4x3/us.svg" alt="Flag of the United States" />
                     <span class="fw-bold lang-description">EN</span>
                   </label>
                 </div>
@@ -977,7 +977,7 @@ const getWelcomeModal = (sections) => {
                   <input type="radio" class="btn-check" name="welcomeInputName" value="pt-br" id="welcomeInputIdBr" autocomplete="off">
                   <label class="w-100 btn btn-outline-success btn-sm text-nowrap" for="welcomeInputIdBr">
                     <span class="fw-bold lang-description">PT-BR</span>
-                    <img src="./public/img/flags/4x3/br.svg" alt="Flag of Brazil" />
+                    <img src="./assets/img/flags/4x3/br.svg" alt="Flag of Brazil" />
                   </label>
                 </div>
               </div>
