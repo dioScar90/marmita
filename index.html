@@ -7,170 +7,18 @@
 
   <title data-content data-en="Lunch box order" data-pt-br="Pedido de marmita">Pedido de marmita</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
   <link rel="stylesheet" href="./assets/css/style.css">
-  <link rel="shortcut icon" href="./assets/img/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-    crossorigin="anonymous"></script>
   <script src="https://kit.fontawesome.com/c5b43aab05.js" crossorigin="anonymous"></script>
-  <!-- <script type="module" src="./assets/js/encryption.js" defer></script> -->
-  <script type="module" src="./assets/js/names.js" defer></script>
-  <script type="module" src="./assets/js/utils.js" defer></script>
-  <script type="module" src="./assets/js/script.js" defer></script>
 </head>
 
 <body>
-  <header class="container">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid position-relative">
-        <a class="navbar-brand" href="index.html">Marmitas</a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.html" data-content data-en="Home"
-                data-pt-br="Início"></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="names.html" data-content data-en="Names" data-pt-br="Nomes"></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="phones.html" data-content data-en="Phones" data-pt-br="Telefones" disabled></a>
-            </li>
-          </ul>
-        </div>
-
-        <div id="switch_lang">
-          <div class="d-flex justify-content-center">
-            <div class="div-lang-en">
-              <input type="radio" class="btn-check" name="options-outlined" value="en" id="primary-outlined"
-                autocomplete="off">
-              <label class="w-100 btn btn-outline-primary btn-sm text-nowrap" for="primary-outlined">
-                <img src="./assets/img/flags/4x3/us.svg" alt="Flag of the United States" />
-                <span class="fw-bold lang-description">EN</span>
-              </label>
-            </div>
-
-            <div class="div-lang-pt-br">
-              <input type="radio" class="btn-check" name="options-outlined" value="pt-br" id="success-outlined"
-                autocomplete="off">
-              <label class="w-100 btn btn-outline-success btn-sm text-nowrap" for="success-outlined">
-                <span class="fw-bold lang-description">PT-BR</span>
-                <img src="./assets/img/flags/4x3/br.svg" alt="Flag of Brazil" />
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <main class="container">
-    <header class="row">
-      <div class="col-12">
-        <h1 data-content data-en="Lunch box order" data-pt-br="Pedidos de marmita"></h1>
-      </div>
-    </header>
-
-    <form id="form-marmitas">
-      <div class="row justify-content-center mt-3">
-        <div class="col-12 d-flex justify-content-center my-2 for-empty-names">
-          <div class="alert alert-warning mb-0 w-100 text-center">
-            <h4 class="alert-heading h4 mb-0" data-content data-en="Nothing to show!" data-pt-br="Nada para exibir!">
-            </h4>
-            <p class="mb-0" data-content data-en="None registered name at the moment."
-              data-pt-br="Nenhum nome cadastrado no momento."></p>
-          </div>
-        </div>
-        <div class="col-12" data-nomes></div>
-      </div>
-
-      <div class="alert alert-success alert-dismissible fade show" role="alert" id="tudo-bem" hidden>
-        <p data-content data-en="Text successfully copied." data-pt-br="Texto copiado com sucesso." class="mb-0">
-          <strong data-content data-en="Alright!" data-pt-br="Tudo bem, tudo bangos!"></strong>
-          <i class="fa-regular fa-face-smile-wink"></i>
-        </p>
-        <button type="button" class="btn-close h-100 py-0" data-bs-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="row justify-content-center" id="botoes-form">
-        <div class="col-12 col-md-6 my-1 row justify-content-center">
-          <div class="col-12 d-flex justify-content-evenly" role="group" aria-label="Basic mixed styles example">
-            <button type="reset" class="btn btn-outline-warning text-nowrap" data-content data-en="Clear"
-              data-pt-br="Limpar" disabled>
-              <i class="fa-solid fa-eraser"></i>
-            </button>
-
-            <button type="button" class="btn btn-outline-light text-nowrap" id="plus_one_more_option" data-content
-              data-en="+1 op." data-pt-br="+1 op." disabled>
-            </button>
-
-            <button type="submit" class="btn btn-primary text-nowrap" disabled>
-              <span data-content data-en="Generate" data-pt-br="Gerar"></span>
-              <i class="fas fa-utensils"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="col-12 col-md-6 my-1 row justify-content-center" hidden>
-          <div class="btn-group col-9" role="group" aria-label="Basic mixed styles example">
-            <button type="button" class="btn btn-outline-light text-nowrap" id="plus_one_more_option" data-content
-              data-en="Option" data-pt-br="Opção" disabled>
-              <i class="fa-solid fa-plus"></i>
-              <i class="fa-solid fa-1"></i>
-            </button>
-            <a href="names.html" class="btn btn-success text-nowrap" data-content data-en="Edit names"
-              data-pt-br="Editar nomes"></a>
-          </div>
-        </div>
-      </div>
-
-    </form>
-
-    <button type="button" class="btn btn-primary" id="openPedidosModal" data-bs-toggle="modal"
-      data-bs-target="#pedidosModal" hidden></button>
-
-    <div class="modal fade" id="pedidosModal" tabindex="-1" role="dialog" aria-labelledby="pedidosModalTitle"
-      aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle" data-content data-en="Here is your text to be copied."
-              data-pt-br="Aqui está seu texto para copiar:"></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-bs-label="Close">
-              <span aria-hidden="true"></span>
-            </button>
-          </div>
-
-          <div class="modal-body"></div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-content data-en="Cancel"
-              data-pt-br="Cancelar"></button>
-            <button type="button" class="btn btn-success" data-copiar data-content data-en="Copy" data-pt-br="Copiar">
-              <i class="fa-solid fa-copy"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <footer class="container mt-5">
-    <h5 class="text-center">
-      &copy; <span id="current_year"></span> | Marmitas S.A.
-    </h5>
-  </footer>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <main id="root"></main>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
