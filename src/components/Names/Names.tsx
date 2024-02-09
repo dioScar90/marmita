@@ -1,16 +1,23 @@
+import { nanoid } from 'nanoid'
 import { FC } from 'react'
 
-const TableRow = (a: number) => {
+interface tableRowProps {
+  key: number
+}
+
+const TableRow: FC<tableRowProps> = ({ key }) => {
+  const nameId = nanoid()
+
   return (
-    <tr key={a} className="" data-name-id="f5feaff6-07ad-4af5-a122-b8aaeb8059df" data-name="Diogo" draggable="true">
+    <tr key={key} className="" data-name-id={nameId} data-name="Diogo" draggable="true">
       <th scope="row"></th>
       <td>
         Diogo
       </td>
       <td className="col col-md-3">
         <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" id={`status_${a}`} checked data-status="" />
-          <label className="form-check-label fw-bold" htmlFor={`status_${a}`} data-ativo="Ativo" data-inativo="Inativo" />
+          <input className="form-check-input" type="checkbox" id={`status_${key}`} defaultChecked data-status="" />
+          <label className="form-check-label fw-bold" htmlFor={`status_${key}`} data-ativo="Ativo" data-inativo="Inativo" />
         </div>
       </td>
       <td className="col col-md-2">
@@ -65,7 +72,7 @@ const Names: FC<namesProps> = (props) => {
           </tr>
         </tbody>
 
-        <tbody>{[1, 2, 3, 4].map(TableRow)}</tbody>
+        <tbody>{[1, 2, 3, 4].map((item) => <TableRow key={item} />)}</tbody>
       </table>
     </>
   )
