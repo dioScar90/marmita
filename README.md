@@ -1,31 +1,30 @@
-# Marmita
+# React + TypeScript + Vite
 
-This is an web app I developed to help me in doing the lunch orders of mine and of my job's collegues.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Want to mock your data manually? Copy/paste it on your browser console and write the names you want passing as a parameter `values: string[]` of `mockData`'s function:
+Currently, two official plugins are available:
 
-```
-const mockData = (values) => {
-  const names = []
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-  for (const name of values) {
-    const isActive = true
-    const id = self.crypto.randomUUID()
-    const newName = { id, name, isActive }
+## Expanding the ESLint configuration
 
-    names.push(newName)
-  }
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-  localStorage.setItem('names', JSON.stringify(names))
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
 }
-
-const names = [
-  // Type here the names you want to mock...
-]
-
-mockData(names.sort())
 ```
 
-Replace the line _// Type here the names..._ by the names you want to mock.
-
-Now you can order your lunch, and also add/remove or enable/disable names. :)
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

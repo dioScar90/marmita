@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom'
 
 const Header = () => {
   const { pathname } = useLocation()
-
+  
   return (
     <header id="my_header">
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -14,10 +14,10 @@ const Header = () => {
           <Navbar.Brand href="/">Marmitas</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link activeKey={pathname} href="/">Home</Nav.Link>
-              <Nav.Link activeKey={pathname} href="/names">Nomes</Nav.Link>
-              <Nav.Link activeKey={pathname} href="/phones">Telefones</Nav.Link>
+            <Nav className="me-auto" activeKey={pathname}>
+              <Nav.Link href="/">Home</Nav.Link>
+              <Nav.Link href="/names">Nomes</Nav.Link>
+              <Nav.Link href="/phones">Telefones</Nav.Link>
               {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">

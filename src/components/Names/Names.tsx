@@ -1,25 +1,49 @@
+import { FC } from 'react'
 
-const TableRow = (a) => {
+const TableRow = (a: number) => {
   return (
     <tr key={a} className="" data-name-id="f5feaff6-07ad-4af5-a122-b8aaeb8059df" data-name="Diogo" draggable="true">
       <th scope="row"></th>
       <td>
-        Vish
+        Diogo
       </td>
       <td className="col col-md-3">
-        Ave
+        <div className="form-check form-switch">
+          <input className="form-check-input" type="checkbox" id={`status_${a}`} checked data-status="" />
+          <label className="form-check-label fw-bold" htmlFor={`status_${a}`} data-ativo="Ativo" data-inativo="Inativo" />
+        </div>
       </td>
       <td className="col col-md-2">
-        Sobrenatural
+        <div className="row">
+          <div className="col px-1">
+            <button type="button" className="btn btn-outline-danger btn-sm m-0" data-remove="">
+              <i className="far fa-trash-alt" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div className="col px-1" hidden>
+            <button type="button" className="btn btn-outline-warning btn-sm m-0" data-order="down">
+              <i className="fa-solid fa-caret-down" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div className="col px-1" hidden>
+            <button type="button" className="btn btn-outline-success btn-sm m-0" data-order="up">
+              <i className="fa-solid fa-caret-up" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
       </td>
     </tr>
   )
 }
 
-const Phones = () => {
+interface namesProps {
+  names: {}
+}
+
+const Names: FC<namesProps> = (props) => {
   return (
     <>
-      <h1>Phones</h1>
+      <h1>Names</h1>
       <table className="table table-striped table-dark table-hover" id="table_names">
         <thead className="thead-dark">
           <tr>
@@ -32,7 +56,7 @@ const Phones = () => {
 
         <tbody className="for-empty-table">
           <tr>
-            <td colspan="100%">
+            <td colSpan={100}>
               <div className="alert alert-warning mb-0 text-center">
                 <h4 className="alert-heading mb-0" data-content="" data-en="Empty Table!" data-pt-br="Tabela Vazia!"></h4>
                 <p className="mb-0" data-content="" data-en="There is no data to be shown at the moment." data-pt-br="No momento não há dados para serem exibidos."></p>
@@ -47,5 +71,5 @@ const Phones = () => {
   )
 }
 
-export default Phones
+export default Names
 

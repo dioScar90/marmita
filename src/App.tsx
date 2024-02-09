@@ -1,11 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import { Outlet, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
-import Home from './Home'
-import Names from './Names'
-import Phones from './Phones'
-import NameDetails from './NameDetails'
-import PhoneDetails from './PhoneDetails'
+import Home from './components/Home'
+import Names from './components/Names/Names'
+import Phones from './components/Phones/Phones'
+import NameDetails from './components/Names/NameDetails'
+import PhoneDetails from './components/Phones/PhoneDetails'
 import Header from './components/Header'
 import Footer from './components/Footer'
 
@@ -49,12 +49,12 @@ const router = createBrowserRouter(
 
       <Route path="names" element={<NamesLayout />}>
         <Route index element={<Names names={names} />} />
-        <Route path=":id" element={<NameDetails names={names} />} />
+        <Route path=":id" element={<NameDetails />} />
       </Route>
 
       <Route path="phones" element={<PhonesLayout />}>
         <Route index element={<Phones phones={phones} />} />
-        <Route path=":id" element={<PhoneDetails phones={phones} />} />
+        <Route path=":id" element={<PhoneDetails />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
@@ -65,3 +65,4 @@ const router = createBrowserRouter(
 const App = () => <RouterProvider router={router} />
 
 export default App
+
