@@ -9,10 +9,32 @@ import NameDetails from './components/Names/NameDetails'
 import PhoneDetails from './components/Phones/PhoneDetails'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
+import { nanoid } from 'nanoid'
 
 const NotFound = () => <div>Not foud</div>
 
-const names = [1, 2, 3, 4, 5]
+const names = [
+  {
+    name: 'Diogo',
+    nameId: nanoid()
+  },
+  {
+    name: 'Karla',
+    nameId: nanoid()
+  },
+  {
+    name: 'Lucas',
+    nameId: nanoid()
+  },
+  {
+    name: 'Pablo',
+    nameId: nanoid()
+  },
+  {
+    name: 'Fabrício',
+    nameId: nanoid()
+  }
+]
 const phones = () => ({})
 
 const NamesLayout = () => {
