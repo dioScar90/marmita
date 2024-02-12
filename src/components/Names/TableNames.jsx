@@ -15,7 +15,7 @@ const EmptyTableBody = () => {
 
 const TableRow = ({ name, nameId }) => {
   return (
-    <tr key={nameId} className="" data-name-id={nameId} data-name={name} draggable="true">
+    <tr className="" data-name-id={nameId} data-name={name} draggable="true">
       <th scope="row"></th>
       <td>
         {name}
@@ -51,7 +51,7 @@ const TableRow = ({ name, nameId }) => {
 
 const TableBodyNames = ({ names }) => {
   return (
-    <tbody>{names.map(({ name, nameId }) => <TableRow name={name} nameId={nameId} />)}</tbody>
+    <tbody>{names.map(({ name, nameId }) => <TableRow key={nameId} name={name} nameId={nameId} />)}</tbody>
   )
 }
 

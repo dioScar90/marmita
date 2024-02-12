@@ -16,7 +16,9 @@ const Header = () => {
             <Nav className="me-auto" activeKey={pathname}>
               <Nav.Link href="/">Home</Nav.Link>
               <Nav.Link href="/names">Nomes</Nav.Link>
+              <Nav.Link href="/names/new">Novo nome</Nav.Link>
               <Nav.Link href="/phones">Telefones</Nav.Link>
+              <Nav.Link href="/phones/new">Novo telefone</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
