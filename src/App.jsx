@@ -11,7 +11,7 @@ import PhoneDetails from './components/Phones/PhoneDetails'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import { nanoid } from 'nanoid'
-import YourFormComponent from './components/Names/YourFormComponent.jsx'
+import FormPhone from './components/Phones/FormPhone.jsx'
 
 const NotFound = () => <div>Not foud</div>
 
@@ -80,6 +80,7 @@ const router = createBrowserRouter(
 
       <Route path="phones" element={<PhonesLayout />}>
         <Route index element={<Phones phones={phones} />} />
+        <Route path="new" element={<FormPhone phones={phones} />} />
         <Route path=":id" element={<PhoneDetails phones={phones} />} />
       </Route>
 
