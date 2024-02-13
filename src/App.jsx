@@ -44,7 +44,7 @@ const NamesLayout = () => {
     <>
       <Header />
       <Container>
-        Names
+        <h1>Names</h1>
         <Outlet />
       </Container>
       <Footer />
@@ -57,7 +57,7 @@ const PhonesLayout = () => {
     <>
       <Header />
       <Container>
-        Phones
+        <h1>Phones</h1>
         <Outlet />
       </Container>
       <Footer />

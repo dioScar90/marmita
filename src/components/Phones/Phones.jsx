@@ -19,7 +19,6 @@ const TableRow = (a) => {
 const Phones = () => {
   return (
     <>
-      <h1>Phones</h1>
       <table className="table table-striped table-dark table-hover" id="table_names">
         <thead className="thead-dark">
           <tr>

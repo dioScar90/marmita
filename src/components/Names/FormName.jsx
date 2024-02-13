@@ -1,91 +1,121 @@
-import { nanoid } from 'nanoid'
-import { useEffect, useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { useFieldArray, useForm } from 'react-hook-form'
 
-
 const FormName = () => {
-  console.log('render')
-  const { register, control, handleSubmit, watch, formState: { errors } } = useForm({
-    defaultValues: {
-      names: [{ name: '' }, { name: '' }]
-    }
+  const { register, control, handleSubmit, getValues, setFocus, formState: { errors } } = useForm({
+    defaultValues: { names: [{ name: '' }] }
   })
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'names'
-  })
-
-  // useEffect(() => {
-  //   console.log('watch', watch('name'))
-  // }, [watch])
-
+  const { fields, append, remove } = useFieldArray({ control, name: 'names' })
+  
   const handleInput = (e) => {
-    const value = e.target.value
-    const name = e.target.name
-
-    console.log('value', value)
-    console.log('name', name)
-    console.log('fields', fields)
-
-    if (value.trim() === '') {
-      console.log('value is empty')
+    if (fields.length < 1) {
+      return
+    }
+    
+    const value = e.target.value.trim()
+    const idInput = e.target.id
+    
+    const valueIsFromLastInput = fields.at(-1)?.id === idInput
+    
+    if (valueIsFromLastInput && value.length > 0) {
+      appendOneMore()
       return
     }
 
-    const valueIsFromLastInput = fields.length > 0 && fields.at(-1).id === e.target.id
-
-    if (!valueIsFromLastInput) {
-      console.log('value is not from last input')
+    const valueIsFromSecondLastInput = fields.length > 2 && fields.at(-2)?.id === idInput
+    
+    if (valueIsFromSecondLastInput && !value.length) {
+      // 50 milisec para dar tempo de 'getValues()' pegar os valores atualizados.
+      setTimeout(removeLastEmptyFields, 50)
+    }
+  }
+  
+  const onSubmit = ({ names }) => {
+    if (!names) {
       return
     }
 
-
-    append({ name: '' }, { shouldFocus: false })
+    const okNames = names.map(({ name }) => name.trim()).filter(name => name.length > 0)
+    console.log('data', okNames)
   }
 
-  const onSubmit = (data) => {
-    console.log('data', data)
-  }
+  const getLastIndexesFromEmptyInputs = () => {
+    const inputValues = getValues('names').map(({ name }) => name.trim())
+    const indexes = [];
+  
+    for (let i = inputValues.length - 1; i >= 0; i--) {
+      if (inputValues[i].length > 0) {
+        break
+      }
+      
+      indexes.push(i)
+    }
 
+    const indexesToRemove = indexes.toSpliced(-1)
+    const indexToFocus = indexes.at(-1)
+    
+    return { indexesToRemove, indexToFocus }
+  }
+  
+  const removeLastEmptyFields = () => {
+    const { indexesToRemove, indexToFocus } = getLastIndexesFromEmptyInputs()
+
+    if (!indexesToRemove.length) {
+      return
+    }
+    
+    remove(indexesToRemove)
+    setFocus(`names.${indexToFocus}.name`)
+  }
+  
+  const appendOneMore = () => append({ name: '' }, { shouldFocus: false })
+  
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      {fields?.map((field, i) => {
-        const required = i > 0 && field.id === fields.at(-1) ? false : { value: true, message: 'Name is required' }
-        // const required = { value: true, message: 'Name is required' }
 
+      {fields?.map((field, i) => {
+        const required = i > 0 && field.id === fields.at(-1).id ? false : { value: true, message: 'Informe um nome ou remova o campo' }
+        const registerName = `names.${i}.name`
+
+        const twoOrMoreFields = fields.length > 1
+        const isLastIndex = i === fields.length - 1
+        
         return (
           <Form.Group className="mb-3 " controlId={field.id} key={field.id}>
             {i === 0 && <Form.Label>Nome</Form.Label>}
 
-            <div className="position-relative">
+            <div className={twoOrMoreFields && !isLastIndex ? 'position-relative' : ''}>
               <Form.Control
                 type="text"
-                {...register(`names.${i}.name`, { required })}
+                {...register(registerName, { required })}
                 onInput={handleInput}
-                placeholder="Escreva o nome"
+                placeholder="Escreva um nome"
+                className={'placeholder_input' + (errors.names?.[i]?.name ? ' border-danger' : '')}
               />
-
-              <div className="position-absolute top-0 end-0 h-100 d-flex align-items-center px-1">
-                <Button
-                  variant="danger" size="sm"
-                  title="Click to remove this input" type="button" tabIndex={-1}
-                  onClick={() => remove(i)}
-                >
-                  &times;
-                </Button>
-              </div>
+              
+              {twoOrMoreFields && !isLastIndex &&
+                <div className="position-absolute top-0 end-0 h-100 d-flex align-items-center px-2">
+                  <Button
+                    variant="warning" size="sm" type="button" tabIndex={-1}
+                    className="py-0 px-1"
+                    title="Click to remove this input" onClick={() => remove(i)}
+                  >
+                    &times;
+                  </Button>
+                </div>
+              }
             </div>
-
-            {errors?.name?.length > 0 && errors?.name[i] && <span>{errors.name[i].message}</span>}
+            
+            {errors.names?.[i]?.name && <span className="text-danger">{errors.names[i].name.message}</span>}
           </Form.Group>
         )
       })}
-
+      
       <Button variant="primary" type="submit">
-        Submit
+        Cadastrar
       </Button>
+
     </Form>
   )
 }
