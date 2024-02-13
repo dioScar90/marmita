@@ -1,5 +1,4 @@
 const NameDList = ({ name }) => {
-
   return (
     <dl className="row justify-content-center mb-0">
       <dt className="col-4 col-md-2 mb-1">

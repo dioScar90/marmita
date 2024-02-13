@@ -1,4 +1,4 @@
-import TableNames from "./TableNames.jsx"
+import TableNames from "./TableNames"
 
 const Names = ({ names }) => {
   return <TableNames names={names} />

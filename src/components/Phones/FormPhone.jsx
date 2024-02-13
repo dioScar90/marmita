@@ -106,7 +106,7 @@ const FormPhone = () => {
         
         return (
           <Form.Group className="mb-3 " controlId={field.id} key={field.id}>
-            {i === 0 && <Form.Label>Nome</Form.Label>}
+            {i === 0 && <Form.Label>Phone</Form.Label>}
 
             <div className={twoOrMoreFields && !isLastIndex ? 'position-relative' : ''}>
               <Form.Control
