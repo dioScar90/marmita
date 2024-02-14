@@ -9,7 +9,7 @@ const FormName = () => {
     defaultValues: { names: [{ name: '' }] }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'names' })
-  const nameWatcher = watchController({ append, remove, getValues, setValue, setFocus, skipNormalize: true })
+  const nameWatcher = watchController({ append, remove, getValues, setValue, setFocus, skipMask: true })
   
   const onSubmit = ({ phoneNumbers }) => {
     if (!phoneNumbers) {
