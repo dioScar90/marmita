@@ -7,11 +7,11 @@ import { useEffect } from 'react'
 import watchController from '../../lib/watchController'
 
 const FormPhone = () => {
-  const { register, control, handleSubmit, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
+  const { register, control, handleSubmit, clearErrors, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
     defaultValues: { phoneNumbers: [{ phone: '' }] }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'phoneNumbers' })
-  const phoneWatcher = watchController({ append, remove, getValues, setValue, setFocus })
+  const phoneWatcher = watchController({ append, remove, getValues, setValue, setFocus, clearErrors })
   
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>

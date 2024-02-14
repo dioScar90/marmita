@@ -5,19 +5,19 @@ import { useEffect } from 'react'
 import watchController from '../../lib/watchController'
 
 const FormName = () => {
-  const { register, control, handleSubmit, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
+  const { register, control, handleSubmit, clearErrors, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
     defaultValues: { names: [{ name: '' }] }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'names' })
-  const nameWatcher = watchController({ append, remove, getValues, setValue, setFocus, skipMask: true })
+  const nameWatcher = watchController({ append, remove, getValues, setValue, setFocus, clearErrors, skipMask: true })
   
-  const onSubmit = ({ phoneNumbers }) => {
-    if (!phoneNumbers) {
+  const onSubmit = ({ names }) => {
+    if (!names) {
       return
     }
 
-    const okPhones = phoneNumbers.map(({ phone }) => phone.trim()).filter(phone => phone.length > 0)
-    console.log('data', okPhones)
+    const okNames = names.map(({ name }) => name.trim()).filter(name => name.length > 0)
+    console.log('data', okNames)
   }
   
   useEffect(() => {

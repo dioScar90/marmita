@@ -1,8 +1,16 @@
 import normalize from './mask';
 
-const watchController = ({ append, remove, getValues, setValue, setFocus, skipMask }) => {
+const watchController = ({
+    append,
+    remove,
+    getValues,
+    setValue,
+    setFocus,
+    clearErrors,
+    skipMask
+  }) => {
   const getLastIndexesFromEmptyInputs = (fieldsName, field) => {
-    const inputValues = getValues(fieldsName).map(f => f[field].trim())
+    const inputValues = getValues(fieldsName).map(item => item[field].trim())
     const indexes = [];
   
     for (let i = inputValues.length - 1; i >= 0; i--) {
@@ -27,6 +35,7 @@ const watchController = ({ append, remove, getValues, setValue, setFocus, skipMa
     }
     
     remove(indexesToRemove)
+    clearErrors(fieldsName)
     setFocus(`${fieldsName}.${indexToFocus}.${field}`)
   }
   
