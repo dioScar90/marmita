@@ -1,11 +1,20 @@
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { useFieldArray, useForm } from 'react-hook-form'
+// import { zodResolver } from '@hookform/resolvers/zod'
+// import { z } from 'zod'
 import { useEffect } from 'react'
 import watchController from '../../lib/watchController'
 
+// const schema = z.object({
+//   names: z.string().trim().min(1, { message: 'Sua mãe é toda minha' })
+// })
+
+// const schemaNames = z.array(schema)
+
 const FormName = () => {
   const { register, control, handleSubmit, clearErrors, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
+    // resolver: zodResolver(schemaNames),
     defaultValues: { names: [{ name: '' }] }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'names' })

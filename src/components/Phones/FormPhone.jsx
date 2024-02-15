@@ -3,11 +3,20 @@ import Form from 'react-bootstrap/Form'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
 import { useFieldArray, useForm } from 'react-hook-form'
+// import { zodResolver } from '@hookform/resolvers/zod'
+// import { z } from 'zod'
 import { useEffect } from 'react'
 import watchController from '../../lib/watchController'
 
+// const schema = z.object({
+//   phoneNumbers: z.string().regex(/^\(\d{2}\) (9\d{4}-\d{4}|3\d{3}-\d{4})$/)
+// })
+
+// const schemaPhones = z.array(schema)
+
 const FormPhone = () => {
   const { register, control, handleSubmit, clearErrors, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
+    // resolver: zodResolver(schemaPhones),
     defaultValues: { phoneNumbers: [{ phone: '' }] }
   })
   const { fields, append, remove } = useFieldArray({ control, name: 'phoneNumbers' })

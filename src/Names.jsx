@@ -50,7 +50,7 @@ const Names = () => {
 
         <tbody className="for-empty-table">
           <tr>
-            <td colspan="100%">
+            <td colSpan="100%">
               <div className="alert alert-warning mb-0 text-center">
                 <h4 className="alert-heading mb-0" data-content="" data-en="Empty Table!" data-pt-br="Tabela Vazia!"></h4>
                 <p className="mb-0" data-content="" data-en="There is no data to be shown at the moment." data-pt-br="No momento não há dados para serem exibidos."></p>
