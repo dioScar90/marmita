@@ -1,6 +1,8 @@
 import Table from 'react-bootstrap/Table'
 import Badge from 'react-bootstrap/Badge'
 import { Link, useLoaderData } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom/dist'
+import { useEffect } from 'react'
 
 const TableRow = ({ gender, name, email, cell, login, seed }) => {
   const linkTo = '/phones/' + seed + '/' + login.uuid
@@ -25,7 +27,10 @@ const TableRow = ({ gender, name, email, cell, login, seed }) => {
   )
 }
 
-const Phones = () => {
+const Phones = ({ title }) => {
+  const { setTitle } = useOutletContext()
+  useEffect(() => setTitle(title), [title, setTitle])
+
   const people = useLoaderData()
   
   return (

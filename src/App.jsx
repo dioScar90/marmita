@@ -13,6 +13,9 @@ import PhoneDetails from './components/Phones/PhoneDetails'
 import FormPhone from './components/Phones/FormPhone'
 import About from './About'
 import axios from 'axios'
+import localforage from 'localforage'
+import DefaultLayout from './DefaultLayout'
+import { redirect } from 'react-router-dom/dist'
 
 const NotFound = () => <div>Not foud</div>
 
@@ -23,58 +26,70 @@ const NamesLayout = () => {
   return (
     <>
       <Header />
-      <Container>
+
+      <Container fluid>
         <h1>Names</h1>
         <Outlet />
       </Container>
+
       <Footer />
     </>
   )
 }
 
-const defaultPhonesLoader = async ({ seed, uuid }) => {
-  const hasSeedAndUuid = seed && uuid
+const defaultPhonesLoader = async ({ seed }) => {
+  const hasSeed = await localforage.getItem('seed')
+  const hasPeople = await localforage.getItem('people')
   
-  const minimumInc = ['gender', 'name', 'email', 'cell', 'login']
-  const picture = hasSeedAndUuid ? ['picture'] : []
-  const inc = [...minimumInc, ...picture].join(',')
+  if (hasPeople && (!seed || hasSeed === seed)) {
+    return hasPeople
+  }
   
+  const inc = ['gender', 'name', 'email', 'cell', 'login', 'picture'].join(',')
   const nat = 'br'
-  const results = 5
+  const results = 10
 
-  const urlParams = new URLSearchParams({ seed: (seed ?? ''), results, nat, inc }).toString()
+  const urlParams = new URLSearchParams({ results, nat, inc }).toString()
   const url = `https://randomuser.me/api/?${urlParams}`
   const { data } = await axios.get(url)
   
-  if (hasSeedAndUuid) {
-    const [ specificData ] = data.results.filter(a => a.login.uuid === uuid)
-    return { ...specificData, seed: data.info.seed }
+  const people = data.results.map((item) => ({ ...item, seed: data.info.seed }))
+  
+  await localforage.setItem('seed', data.info.seed)
+  await localforage.setItem('people', people)
+  
+  return people
+}
+
+const phonesLoader = async ({ params: { seed, uuid } }) => {
+  const people = await defaultPhonesLoader({ seed, uuid })
+  
+  if (uuid) {
+    return people?.find(p => p.login.uuid === uuid) ?? null
   }
 
-  return data.results.map((item) => ({ ...item, seed: data.info.seed }))
+  return people
 }
 
-const phonesLoader = async () => await defaultPhonesLoader({})
-const phonesLoaderWithSeed = async ({ params: { seed } }) => await defaultPhonesLoader({ seed })
-const phonesLoaderWithUUID = async ({ params: { seed, uuid } }) => await defaultPhonesLoader({ seed, uuid })
+// const PhonesLayout = () => {
+//   return (
+//     <>
+//       <Header />
 
-const PhonesLayout = () => {
-  return (
-    <>
-      <Header />
-      <Container>
-        <h1>Phones</h1>
-        <Outlet />
-      </Container>
-      <Footer />
-    </>
-  )
-}
+//       <Container fluid>
+//         <h1>Phones</h1>
+//         <Outlet />
+//       </Container>
+
+//       <Footer />
+//     </>
+//   )
+// }
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/">
-      <Route index element={<Home />} />
+    <Route path="/" element={<DefaultLayout />} >
+      <Route index element={<Home title="Home" />} />
 
       <Route path="about" element={<About />} />
 
@@ -86,13 +101,13 @@ const router = createBrowserRouter(
         <Route path="new" element={<FormName names={names} />} />
       </Route>
 
-      <Route path="phones" element={<PhonesLayout />}>
-        <Route index element={<Phones />} loader={phonesLoader} />
-        <Route path=":seed" element={<Phones />} loader={phonesLoaderWithSeed} />
-        <Route path=":seed/:uuid" element={<PhoneDetails />} loader={phonesLoaderWithUUID} />
+      <Route path="phones">
+        <Route index element={<Phones title="Todos os telefones" />} loader={phonesLoader} />
+        <Route path=":seed" element={<Phones title="Todos os telefones" />} loader={phonesLoader} />
+        <Route path=":seed/:uuid" element={<PhoneDetails title="Telefone específico" />} loader={phonesLoader} />
         <Route path=":id/edit" element={<PhoneDetails />} />
         <Route path=":id/delete" element={<PhoneDetails />} />
-        <Route path="new" element={<FormPhone />} />
+        <Route path="new" element={<FormPhone title="Novo telefone" />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

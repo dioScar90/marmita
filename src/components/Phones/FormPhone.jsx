@@ -7,6 +7,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 // import { z } from 'zod'
 import { useEffect } from 'react'
 import watchController from '../../lib/watchController'
+import { useOutletContext } from 'react-router-dom/dist'
 
 // const schema = z.object({
 //   phoneNumbers: z.string().regex(/^\(\d{2}\) (9\d{4}-\d{4}|3\d{3}-\d{4})$/)
@@ -14,7 +15,10 @@ import watchController from '../../lib/watchController'
 
 // const schemaPhones = z.array(schema)
 
-const FormPhone = () => {
+const FormPhone = ({ title }) => {
+  const { setTitle } = useOutletContext()
+  useEffect(() => setTitle(title), [title, setTitle])
+
   const { register, control, handleSubmit, clearErrors, getValues, setValue, setFocus, watch, formState: { errors } } = useForm({
     // resolver: zodResolver(schemaPhones),
     defaultValues: { phoneNumbers: [{ phone: '' }] }

@@ -1,11 +1,16 @@
+import { useEffect } from 'react'
 import { Card, Col, ListGroup, Row } from 'react-bootstrap'
-import { Link, redirect, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
+import { Navigate, useOutletContext } from 'react-router-dom/dist'
 
-const PhoneDetails = () => {
+const PhoneDetails = ({ title }) => {
+  const { setTitle } = useOutletContext()
+  useEffect(() => setTitle(title), [title, setTitle])
+
   const phoneDetails = useLoaderData()
   
   if (!phoneDetails) {
-    return redirect('/phones')
+    return <Navigate to='/' />
   }
   
   const linkTo = '/phones/' + phoneDetails.seed

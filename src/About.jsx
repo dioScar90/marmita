@@ -6,9 +6,11 @@ const About = () => {
   return (
     <>
       <Header />
+
       <Container>
         <p>About</p>
       </Container>
+      
       <Footer />
     </>
   )
