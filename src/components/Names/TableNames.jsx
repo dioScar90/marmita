@@ -4,8 +4,18 @@ const EmptyTableBody = () => {
       <tr>
         <td colSpan={100}>
           <div className="alert alert-warning mb-0 text-center">
-            <h4 className="alert-heading mb-0" data-content="" data-en="Empty Table!" data-pt-br="Tabela Vazia!"></h4>
-            <p className="mb-0" data-content="" data-en="There is no data to be shown at the moment." data-pt-br="No momento não há dados para serem exibidos."></p>
+            <h4
+              className="alert-heading mb-0"
+              data-content=""
+              data-en="Empty Table!"
+              data-pt-br="Tabela Vazia!"
+            ></h4>
+            <p
+              className="mb-0"
+              data-content=""
+              data-en="There is no data to be shown at the moment."
+              data-pt-br="No momento não há dados para serem exibidos."
+            ></p>
           </div>
         </td>
       </tr>
@@ -17,13 +27,22 @@ const TableRow = ({ name, nameId }) => {
   return (
     <tr className="" data-name-id={nameId} data-name={name} draggable="true">
       <th scope="row"></th>
-      <td>
-        {name}
-      </td>
+      <td>{name}</td>
       <td className="col col-md-3">
         <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" id={`status_${nameId}`} defaultChecked data-status="" />
-          <label className="form-check-label fw-bold" htmlFor={`status_${nameId}`} data-ativo="Ativo" data-inativo="Inativo" />
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id={`status_${nameId}`}
+            defaultChecked
+            data-status=""
+          />
+          <label
+            className="form-check-label fw-bold"
+            htmlFor={`status_${nameId}`}
+            data-ativo="Ativo"
+            data-inativo="Inativo"
+          />
         </div>
       </td>
       <td className="col col-md-2">
@@ -51,12 +70,15 @@ const TableRow = ({ name, nameId }) => {
 
 const TableBodyNames = ({ names }) => {
   return (
-    <tbody>{names.map(({ name, nameId }) => <TableRow key={nameId} name={name} nameId={nameId} />)}</tbody>
+    <tbody>
+      {names.map(({ name, nameId }) => (
+        <TableRow key={nameId} name={name} nameId={nameId} />
+      ))}
+    </tbody>
   )
 }
 
 const TableNames = ({ names }) => {
-  console.log('names', names)
   return (
     <table className="table table-striped table-dark table-hover" id="table_names">
       <thead className="thead-dark">
@@ -68,10 +90,9 @@ const TableNames = ({ names }) => {
         </tr>
       </thead>
 
-      {names.length === 0 ? <EmptyTableBody /> : <TableBodyNames names={names} />}
+      {!names.length ? <EmptyTableBody /> : <TableBodyNames names={names} />}
     </table>
   )
 }
 
 export default TableNames
-
