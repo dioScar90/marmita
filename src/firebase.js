@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite'
-import { getAnalytics } from 'firebase/analytics'
 
 const firebaseConfig = {
   // apiKey: 'AIzaSyDvnAIHgMTDOwrGWt7KBKfdCLCfyCjSPao',
@@ -23,7 +22,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
-const analytics = getAnalytics(app)
 
 async function getPhoneNumbers(db) {
   const marmitaCol = collection(db, 'phoneNumbers')

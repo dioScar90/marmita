@@ -1,10 +1,9 @@
-import Table from 'react-bootstrap/Table'
 import Badge from 'react-bootstrap/Badge'
 import Image from 'react-bootstrap/Image'
+import Table from 'react-bootstrap/Table'
 import { Link, useLoaderData } from 'react-router-dom'
-import { useOutletContext } from 'react-router-dom/dist'
-import { useEffect } from 'react'
 
+// eslint-disable-next-line react/prop-types
 const TableRow = ({ gender, name, email, cell, login, picture, seed }) => {
   const linkTo = '/phones/' + seed + '/' + login.uuid
 
@@ -31,14 +30,13 @@ const TableRow = ({ gender, name, email, cell, login, picture, seed }) => {
   )
 }
 
-const Phones = ({ title }) => {
-  const { setTitle } = useOutletContext()
-  useEffect(() => setTitle(title), [title, setTitle])
-
-  const people = useLoaderData()
-
+const Phones = () => {
+  const { people } = useLoaderData() ?? {}
+  
   return (
     <>
+      <h1>Todos os telefones</h1>
+
       <Table striped bordered hover id="table_phones">
         <thead className="thead-dark">
           <tr>
@@ -48,7 +46,9 @@ const Phones = ({ title }) => {
             <th scope="col">Email</th>
           </tr>
         </thead>
-        <tbody>{people?.map((p) => <TableRow key={p.login.uuid} {...p} />)}</tbody>
+        <tbody>
+          {people?.map((p) => <TableRow key={p.login.uuid} {...p} />)}
+        </tbody>
       </Table>
     </>
   )

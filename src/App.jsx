@@ -37,12 +37,12 @@ const NamesLayout = () => {
   )
 }
 
-const defaultPhonesLoader = async ({ seed }) => {
+const phonesLoader = async ({ params: { seed, uuid } }) => {
   const hasSeed = await localforage.getItem('seed')
   const hasPeople = await localforage.getItem('people')
   
   if (hasPeople && (!seed || hasSeed === seed)) {
-    return hasPeople
+    return { people: hasPeople }
   }
   
   const inc = ['gender', 'name', 'email', 'cell', 'login', 'picture'].join(',')
@@ -57,34 +57,14 @@ const defaultPhonesLoader = async ({ seed }) => {
   
   await localforage.setItem('seed', data.info.seed)
   await localforage.setItem('people', people)
-  
-  return people
-}
 
-const phonesLoader = async ({ params: { seed, uuid } }) => {
-  const people = await defaultPhonesLoader({ seed, uuid })
-  
   if (uuid) {
-    return people?.find(p => p.login.uuid === uuid) ?? null
+    const person = people?.find(p => p.login.uuid === uuid)
+    return person ?? redirect('/')
   }
-
-  return people
+  
+  return { people }
 }
-
-// const PhonesLayout = () => {
-//   return (
-//     <>
-//       <Header />
-
-//       <Container fluid>
-//         <h1>Phones</h1>
-//         <Outlet />
-//       </Container>
-
-//       <Footer />
-//     </>
-//   )
-// }
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -102,12 +82,12 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="phones">
-        <Route index element={<Phones title="Todos os telefones" />} loader={phonesLoader} />
-        <Route path=":seed" element={<Phones title="Todos os telefones" />} loader={phonesLoader} />
-        <Route path=":seed/:uuid" element={<PhoneDetails title="Telefone específico" />} loader={phonesLoader} />
+        <Route index element={<Phones />} loader={phonesLoader} />
+        <Route path=":seed" element={<Phones />} loader={phonesLoader} />
+        <Route path=":seed/:uuid" element={<PhoneDetails />} loader={phonesLoader} />
         <Route path=":id/edit" element={<PhoneDetails />} />
         <Route path=":id/delete" element={<PhoneDetails />} />
-        <Route path="new" element={<FormPhone title="Novo telefone" />} />
+        <Route path="new" element={<FormPhone />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
